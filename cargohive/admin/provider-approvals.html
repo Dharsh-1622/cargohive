@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provider Approvals — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar admin-sidebar" id="sidebar">
+      <div class="sidebar-brand"><a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a></div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" data-nav="dashboard" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-nav="approvals" href="provider-approvals.html"><span>✓</span> Provider Approvals</a>
+        <a class="nav-link" data-nav="providers" href="providers.html"><span>🚛</span> Providers</a>
+        <a class="nav-link" data-nav="traders" href="traders.html"><span>📦</span> Traders</a>
+        <a class="nav-link" data-nav="vehicles" href="vehicles.html"><span>🚚</span> Vehicles</a>
+        <a class="nav-link" data-nav="bookings" href="bookings.html"><span>📋</span> Bookings</a>
+        <a class="nav-link" data-nav="reports" href="reports.html"><span>📈</span> Reports</a>
+        <a class="nav-link" data-nav="settings" href="settings.html"><span>⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn btn-ghost btn-block" style="color:rgba(255,255,255,0.8);justify-content:flex-start" onclick="CS.logout('../index.html')">Logout</button></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle">☰</button>
+          <div class="page-title" style="font-size:1.25rem;margin:0">Provider Approvals</div></div>
+      </header>
+      <main class="page-body"><div id="list"></div></main>
+    </div>
+  </div>
+  <div class="modal-overlay" id="reject-modal">
+    <div class="modal">
+      <h3 class="modal-title">Reject provider</h3>
+      <div class="modal-body">
+        <input type="hidden" id="reject-provider-id" />
+        <label class="form-label">Rejection reason</label>
+        <textarea class="form-textarea" id="reject-reason" rows="3" placeholder="Incomplete GST / documents…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="CS.closeModal('reject-modal')">Cancel</button>
+        <button class="btn btn-danger" id="confirm-reject">Reject</button>
+      </div>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/admin.js"></script>
+  <script>
+    const session = CS.requireRole('admin', 'login.html');
+    if (session) {
+      CS.initSidebar(); CS.setActiveNav('approvals');
+      const list = document.getElementById('list');
+      AdminApp.renderApprovals(list);
+      document.getElementById('confirm-reject').onclick = () => {
+        const id = document.getElementById('reject-provider-id').value;
+        const reason = document.getElementById('reject-reason').value.trim() || 'Incomplete documentation';
+        AdminApp.rejectProvider(id, reason);
+        CS.closeModal('reject-modal');
+        AdminApp.renderApprovals(list);
+      };
+    }
+  </script>
+</body>
+</html>

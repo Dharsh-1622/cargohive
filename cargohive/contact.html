@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Contact CargoHive — support, business, and provider enquiries." />
+  <title>Contact — CargoHive</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+</head>
+<body class="public-page">
+  <div id="site-nav"></div>
+
+  <header class="page-hero">
+    <h1>Let's Connect</h1>
+    <p>Questions about the demo, partnerships, or provider onboarding? Send a message — frontend validation only for now.</p>
+  </header>
+
+  <section class="section-wrap">
+    <div class="ch-grid-2" style="align-items:start">
+      <div class="card reveal">
+        <h2 class="card-title mb-4">Send a message</h2>
+        <form id="contact-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Name</label>
+              <input class="form-input" id="name" required />
+              <div class="form-error">Required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" id="email" required />
+              <div class="form-error">Required</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input class="form-input" id="phone" placeholder="+91 XXXXX XXXXX" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Company</label>
+              <input class="form-input" id="company" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <select class="form-select" id="subject" required>
+              <option value="">Select</option>
+              <option>General Support</option>
+              <option>Business Enquiry</option>
+              <option>Provider Support</option>
+              <option>Demo / Hackathon</option>
+            </select>
+            <div class="form-error">Required</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-textarea" id="message" rows="5" required placeholder="How can we help?"></textarea>
+            <div class="form-error">Required</div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg">Send Message</button>
+        </form>
+        <div id="contact-success" class="notice notice-success mt-4 hidden">
+          Message received. Our team will get back to you.
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="ch-card mb-4">
+          <div class="ch-icon">💬</div>
+          <h3>Support</h3>
+          <p>Product questions, demo walkthroughs, and account help.</p>
+          <p class="mt-3 text-sm"><strong>support@cargohive.example</strong></p>
+        </div>
+        <div class="ch-card mb-4">
+          <div class="ch-icon">🤝</div>
+          <h3>Business Enquiries</h3>
+          <p>Partnerships, corridor pilots, and marketplace discussions.</p>
+          <p class="mt-3 text-sm"><strong>business@cargohive.example</strong></p>
+        </div>
+        <div class="ch-card">
+          <div class="ch-icon">🚛</div>
+          <h3>Provider Support</h3>
+          <p>Verification status, vehicle listing, and capacity publishing help.</p>
+          <p class="mt-3 text-sm"><strong>providers@cargohive.example</strong></p>
+          <p class="text-sm text-muted mt-2">Phone: +91 XXXXX XXXXX<br/>Location: Tamil Nadu, India</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+  <script src="js/common.js"></script>
+  <script src="js/site.js"></script>
+  <script>
+    CargoHiveSite.initPublicShell('contact');
+    document.getElementById('contact-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!CS.validateRequired(e.target)) {
+        CS.toast('Please fill all required fields', 'error');
+        return;
+      }
+      if (!CS.isEmail(email.value.trim())) {
+        CS.toast('Enter a valid email', 'error');
+        return;
+      }
+      document.getElementById('contact-success').classList.remove('hidden');
+      CS.toast('Message received. Our team will get back to you.', 'success');
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile — CargoHive</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a></div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" data-nav="dashboard" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-nav="search" href="search-space.html"><span>🔍</span> Find Cargo Space</a>
+        <a class="nav-link" data-nav="bookings" href="bookings.html"><span>📋</span> My Bookings</a>
+        <a class="nav-link" data-nav="chat" href="chat.html"><span>💬</span> Messages</a>
+        <a class="nav-link" data-nav="notifications" href="notifications.html"><span>🔔</span> Notifications</a>
+        <a class="nav-link" data-nav="profile" href="profile.html"><span>👤</span> Profile</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn btn-ghost btn-block" style="color:rgba(255,255,255,0.8);justify-content:flex-start" onclick="CS.logout('../index.html')">Logout</button></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle">☰</button>
+          <div class="page-title" style="font-size:1.25rem;margin:0">Profile</div></div>
+      </header>
+      <main class="page-body">
+        <div class="grid-2" style="align-items:start">
+          <div class="card">
+            <h3 class="card-title mb-4">Personal & business information</h3>
+            <form id="profile-form">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="fullName" required /></div>
+                <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="email" type="email" required /></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="phone" required /></div>
+                <div class="form-group"><label class="form-label">Business Name</label><input class="form-input" id="businessName" required /></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Business Type</label><input class="form-input" id="businessType" /></div>
+                <div class="form-group"><label class="form-label">GST</label><input class="form-input" id="gst" /></div>
+              </div>
+              <div class="form-group"><label class="form-label">Address</label><input class="form-input" id="address" /></div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">City</label><input class="form-input" id="city" /></div>
+                <div class="form-group"><label class="form-label">State</label><input class="form-input" id="state" /></div>
+              </div>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+          </div>
+          <div class="card">
+            <h3 class="card-title mb-4">Security</h3>
+            <form id="pw-form">
+              <div class="form-group"><label class="form-label">Current Password</label><input class="form-input" type="password" id="current" required /></div>
+              <div class="form-group"><label class="form-label">New Password</label><input class="form-input" type="password" id="next" required /></div>
+              <div class="form-group"><label class="form-label">Confirm New Password</label><input class="form-input" type="password" id="confirm" required /></div>
+              <button type="submit" class="btn btn-secondary">Change Password</button>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/trader.js"></script>
+  <script>
+    const session = CS.requireRole('trader', 'login.html');
+    if (session) {
+      CS.initSidebar(); CS.setActiveNav('profile');
+      const t = CS.getTraders().find(x => x.id === session.id);
+      if (t) {
+        fullName.value = t.fullName; email.value = t.email; phone.value = t.phone;
+        businessName.value = t.businessName; businessType.value = t.businessType;
+        gst.value = t.gst || ''; address.value = t.address; city.value = t.city; state.value = t.state;
+      }
+      document.getElementById('profile-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        TraderApp.updateProfile({
+          fullName: fullName.value.trim(), email: email.value.trim(), phone: phone.value.trim(),
+          businessName: businessName.value.trim(), businessType: businessType.value.trim(),
+          gst: gst.value.trim(), address: address.value.trim(), city: city.value.trim(), state: state.value.trim(),
+        });
+      });
+      document.getElementById('pw-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (TraderApp.changePassword(current.value, next.value, confirm.value)) {
+          current.value = next.value = confirm.value = '';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

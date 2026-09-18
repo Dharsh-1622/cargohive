@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Vehicle — CargoHive</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a></div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" data-nav="dashboard" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-nav="vehicles" href="vehicles.html"><span>🚛</span> My Vehicles</a>
+        <a class="nav-link" data-nav="add-vehicle" href="add-vehicle.html"><span>➕</span> Add Vehicle</a>
+        <a class="nav-link" data-nav="availability" href="availability.html"><span>📐</span> Availability</a>
+        <a class="nav-link" data-nav="bookings" href="bookings.html"><span>📋</span> Bookings</a>
+        <a class="nav-link" data-nav="chat" href="chat.html"><span>💬</span> Messages</a>
+        <a class="nav-link" data-nav="notifications" href="notifications.html"><span>🔔</span> Notifications</a>
+        <a class="nav-link" data-nav="profile" href="profile.html"><span>👤</span> Profile</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn btn-ghost btn-block" style="color:rgba(255,255,255,0.8);justify-content:flex-start" onclick="CS.logout('../index.html')">Logout</button></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle">☰</button>
+          <div class="page-title" style="font-size:1.25rem;margin:0">Add Vehicle</div></div>
+      </header>
+      <main class="page-body">
+        <div class="card" style="max-width:720px">
+          <form id="add-form">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Vehicle Number</label><input class="form-input" id="vehicleNumber" required placeholder="TN-33-XX-0000" /><div class="form-error">Required</div></div>
+              <div class="form-group"><label class="form-label">Vehicle Type</label>
+                <select class="form-select" id="vehicleType" required>
+                  <option>Mini Truck</option><option>Pickup Van</option><option selected>10 CBM Truck</option>
+                  <option>Closed Container Truck</option><option>Lorry</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Total CBM</label><input class="form-input" type="number" id="totalCbm" required value="10" /></div>
+              <div class="form-group"><label class="form-label">Maximum Weight (KG)</label><input class="form-input" type="number" id="maxWeight" required value="2000" /></div>
+            </div>
+            <h3 class="card-title mb-3 mt-2">Route</h3>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Start Location</label><input class="form-input" id="start" required value="Erode" /></div>
+              <div class="form-group"><label class="form-label">Stop 1</label><input class="form-input" id="stop1" value="Salem" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Stop 2</label><input class="form-input" id="stop2" /></div>
+              <div class="form-group"><label class="form-label">Destination</label><input class="form-input" id="destination" required value="Chennai" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Departure Date</label><input class="form-input" type="date" id="departureDate" required value="2026-03-15" /></div>
+              <div class="form-group"><label class="form-label">Departure Time</label><input class="form-input" type="time" id="departureTime" required value="08:00" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Estimated Arrival Date</label><input class="form-input" type="date" id="etaDate" required value="2026-03-15" /></div>
+              <div class="form-group"><label class="form-label">Estimated Arrival Time</label><input class="form-input" type="time" id="etaTime" required value="14:00" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Available CBM</label><input class="form-input" type="number" id="availableCbm" required value="10" /></div>
+              <div class="form-group"><label class="form-label">Available Weight</label><input class="form-input" type="number" id="availableWeight" required value="2000" /></div>
+            </div>
+            <div class="form-group"><label class="form-label">Price per CBM (₹)</label><input class="form-input" type="number" id="pricePerCbm" value="1200" /></div>
+            <div class="flex gap-3 mb-4" style="flex-wrap:wrap">
+              <label class="form-check" style="margin:0"><input type="checkbox" id="tempControlled" /> Temperature Controlled?</label>
+              <label class="form-check" style="margin:0"><input type="checkbox" id="refrigerated" /> Refrigerated?</label>
+              <label class="form-check" style="margin:0"><input type="checkbox" id="hazardousAllowed" /> Hazardous Cargo Allowed?</label>
+              <label class="form-check" style="margin:0"><input type="checkbox" id="fragileSupported" checked /> Fragile Cargo Supported?</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Add Vehicle</button>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/provider.js"></script>
+  <script>
+    const session = CS.requireRole('provider', 'login.html');
+    if (session) {
+      CS.initSidebar(); CS.setActiveNav('add-vehicle');
+      document.getElementById('add-form').onsubmit = (e) => {
+        e.preventDefault();
+        if (!CS.validateRequired(e.target)) { CS.toast('Fill required fields', 'error'); return; }
+        ProviderApp.addVehicle({
+          vehicleNumber: vehicleNumber.value.trim(), vehicleType: vehicleType.value,
+          totalCbm: totalCbm.value, maxWeight: maxWeight.value,
+          start: start.value.trim(), stop1: stop1.value.trim(), stop2: stop2.value.trim(), destination: destination.value.trim(),
+          departureDate: departureDate.value, departureTime: departureTime.value,
+          etaDate: etaDate.value, etaTime: etaTime.value,
+          availableCbm: availableCbm.value, availableWeight: availableWeight.value, pricePerCbm: pricePerCbm.value,
+          tempControlled: tempControlled.checked, refrigerated: refrigerated.checked,
+          hazardousAllowed: hazardousAllowed.checked, fragileSupported: fragileSupported.checked,
+        });
+      };
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Success — CargoHive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { cs: { navy: '#0b1f3a', blue: '#1d4ed8', sky: '#0ea5e9' } },
+          fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <a href="../index.html" class="cs-logo cs-logo-white">
+          <span class="cs-logo-mark">CH</span>
+          <span>CargoHive</span>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="dashboard.html" data-nav="dashboard"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 5h7v7H4V5zm9 0h7v5h-7V5zM4 14h7v5H4v-5zm9 2h7v3h-7v-3z"/></svg> Dashboard</a>
+        <a class="nav-link" href="search-space.html" data-nav="search"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-width="2" d="M20 20l-3-3"/></svg> Search Space</a>
+        <a class="nav-link" href="bookings.html" data-nav="bookings"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7h8M8 11h8M8 15h5M6 3h12a2 2 0 012 2v14l-4-2-4 2-4-2-4 2V5a2 2 0 012-2z"/></svg> Bookings</a>
+        <a class="nav-link" href="chat.html" data-nav="chat"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 10h8M8 14h5M21 12a9 9 0 11-3.5-7.1L21 5v7z"/></svg> Chat</a>
+        <a class="nav-link" href="notifications.html" data-nav="notifications"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0"/></svg> Notifications</a>
+        <a class="nav-link" href="profile.html" data-nav="profile"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"/></svg> Profile</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="nav-link w-full" type="button" onclick="CS.logout('../index.html')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 12H4m0 0l3-3m-3 3l3 3m5-10h5a2 2 0 012 2v12a2 2 0 01-2 2h-5"/></svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Menu">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div>
+            <div class="font-semibold text-navy" id="topbar-name">Trader</div>
+            <div class="text-xs text-muted">Payment complete</div>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-body">
+        <div class="card" style="max-width:640px;margin:0 auto;text-align:center" id="success-root">
+          <div class="empty-state"><div class="loading-spinner"></div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/trader.js"></script>
+  <script>
+    const session = CS.requireRole("trader", "login.html");
+    if (session) {
+      CS.initSidebar();
+      CS.setActiveNav("bookings");
+      document.getElementById("topbar-name").textContent = session.name || "Trader";
+
+      const b = TraderApp.getLastBooking();
+      const root = document.getElementById("success-root");
+      if (!b) {
+        root.innerHTML = '<div class="empty-state"><p>No recent payment found.</p><a class="btn btn-primary mt-4" href="dashboard.html">Dashboard</a></div>';
+      } else {
+        root.innerHTML = `
+          <div style="width:72px;height:72px;border-radius:50%;background:var(--cs-success-bg);color:var(--cs-success);display:grid;place-items:center;margin:0 auto 20px;font-size:2rem;font-weight:700">✓</div>
+          <h1 class="page-title" style="text-align:center">Payment successful!</h1>
+          <p class="page-sub" style="text-align:center">Your shared cargo space is reserved. Provider has been notified.</p>
+          <div class="notice notice-success" style="text-align:left;margin-bottom:20px">
+            <div class="font-bold mb-2">${b.id}</div>
+            <div class="text-sm">${b.providerName} · ${b.cargoName}</div>
+            <div class="text-sm mt-1">${CS.formatRoute(b.route)}</div>
+            <div class="flex-between mt-3">
+              <span>${b.cbm} CBM · ${b.weight} KG</span>
+              <strong>${CS.formatINR(b.total)}</strong>
+            </div>
+            <div class="text-xs mt-2">Txn ${b.txnId} · ${b.paymentMethod}</div>
+          </div>
+          <div class="flex gap-2" style="justify-content:center;flex-wrap:wrap">
+            <a class="btn btn-primary" href="booking-details.html?id=${encodeURIComponent(b.id)}">View Booking</a>
+            <a class="btn btn-secondary" href="dashboard.html">Dashboard</a>
+          </div>`;
+      }
+    }
+  </script>
+</body>
+</html>

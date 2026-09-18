@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar admin-sidebar" id="sidebar">
+      <div class="sidebar-brand"><a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a></div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" data-nav="dashboard" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-nav="approvals" href="provider-approvals.html"><span>✓</span> Provider Approvals</a>
+        <a class="nav-link" data-nav="providers" href="providers.html"><span>🚛</span> Providers</a>
+        <a class="nav-link" data-nav="traders" href="traders.html"><span>📦</span> Traders</a>
+        <a class="nav-link" data-nav="vehicles" href="vehicles.html"><span>🚚</span> Vehicles</a>
+        <a class="nav-link" data-nav="bookings" href="bookings.html"><span>📋</span> Bookings</a>
+        <a class="nav-link" data-nav="reports" href="reports.html"><span>📈</span> Reports</a>
+        <a class="nav-link" data-nav="settings" href="settings.html"><span>⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn btn-ghost btn-block" style="color:rgba(255,255,255,0.8);justify-content:flex-start" onclick="CS.logout('../index.html')">Logout</button></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle">☰</button>
+          <div class="page-title" style="font-size:1.25rem;margin:0">Analytics & Reports</div></div>
+      </header>
+      <main class="page-body">
+        <div class="stats-grid" id="stats"></div>
+        <div class="grid-2 mb-6" style="align-items:start">
+          <div class="card">
+            <h3 class="card-title mb-4">Monthly Bookings</h3>
+            <div class="bar-chart" id="monthly"></div>
+          </div>
+          <div class="card">
+            <h3 class="card-title mb-4">Most Active Routes</h3>
+            <div id="routes"></div>
+          </div>
+        </div>
+        <div class="grid-2" style="align-items:start">
+          <div class="card">
+            <h3 class="card-title mb-4">Top Providers</h3>
+            <div id="providers"></div>
+          </div>
+          <div class="card">
+            <h3 class="card-title mb-4">Cargo Volume</h3>
+            <div class="stat-value" id="volume"></div>
+            <div class="text-sm text-muted mt-2">Total CBM booked across platform</div>
+            <div class="divider"></div>
+            <div class="info-label">Revenue (paid)</div>
+            <div class="price-tag mt-2" id="revenue"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/admin.js"></script>
+  <script>
+    const session = CS.requireRole('admin', 'login.html');
+    if (session) {
+      CS.initSidebar(); CS.setActiveNav('reports');
+      const r = AdminApp.reportData();
+      // Enrich with demo routes if sparse
+      const routeDefaults = {
+        'Erode → Salem → Chennai': 12,
+        'Tiruppur → Chennai': 9,
+        'Coimbatore → Chennai': 7,
+        'Erode → Bangalore': 5,
+        'Tiruppur → Bangalore': 4,
+      };
+      Object.keys(routeDefaults).forEach(k => { if (!r.routes[k]) r.routes[k] = routeDefaults[k]; else r.routes[k] += routeDefaults[k]; });
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Total Bookings</div><div class="stat-value">${r.totalBookings}</div></div>
+        <div class="stat-card"><div class="stat-label">Revenue</div><div class="stat-value" style="font-size:1.35rem">${CS.formatINR(r.revenue)}</div></div>
+        <div class="stat-card"><div class="stat-label">Cargo Volume</div><div class="stat-value">${r.volume}</div><div class="stat-meta">CBM</div></div>
+        <div class="stat-card"><div class="stat-label">Active Routes</div><div class="stat-value">${Object.keys(r.routes).length}</div></div>`;
+      const max = Math.max(...r.monthly, 1);
+      document.getElementById('monthly').innerHTML = r.months.map((m,i) => `
+        <div class="bar-col"><div class="bar-fill" style="height:${Math.round(r.monthly[i]/max*100)}%"></div><div class="bar-label">${m}<br/><span style="color:var(--cs-navy);font-weight:600">${r.monthly[i]}</span></div></div>`).join('');
+      const routeMax = Math.max(...Object.values(r.routes), 1);
+      document.getElementById('routes').innerHTML = Object.entries(r.routes).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v]) => `
+        <div class="hbar"><div class="hbar-label">${k}</div><div class="hbar-track"><div class="hbar-fill" style="width:${Math.round(v/routeMax*100)}%"></div></div><div class="text-sm font-semibold">${v}</div></div>`).join('');
+      const pMax = Math.max(...Object.values(r.providers), 1);
+      document.getElementById('providers').innerHTML = Object.entries(r.providers).sort((a,b)=>b[1]-a[1]).map(([k,v]) => `
+        <div class="hbar"><div class="hbar-label">${k}</div><div class="hbar-track"><div class="hbar-fill" style="width:${Math.round(v/pMax*100)}%"></div></div><div class="text-sm font-semibold">${v}</div></div>`).join('') || '<p class="text-muted text-sm">No data</p>';
+      document.getElementById('volume').textContent = r.volume + ' CBM';
+      document.getElementById('revenue').textContent = CS.formatINR(r.revenue);
+    }
+  </script>
+</body>
+</html>

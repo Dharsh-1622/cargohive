@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cargo Details — CargoHive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { cs: { navy: '#0b1f3a', blue: '#1d4ed8', sky: '#0ea5e9' } },
+          fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <a href="../index.html" class="cs-logo cs-logo-white">
+          <span class="cs-logo-mark">CH</span>
+          <span>CargoHive</span>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="dashboard.html" data-nav="dashboard"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 5h7v7H4V5zm9 0h7v5h-7V5zM4 14h7v5H4v-5zm9 2h7v3h-7v-3z"/></svg> Dashboard</a>
+        <a class="nav-link" href="search-space.html" data-nav="search"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-width="2" d="M20 20l-3-3"/></svg> Search Space</a>
+        <a class="nav-link" href="bookings.html" data-nav="bookings"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7h8M8 11h8M8 15h5M6 3h12a2 2 0 012 2v14l-4-2-4 2-4-2-4 2V5a2 2 0 012-2z"/></svg> Bookings</a>
+        <a class="nav-link" href="chat.html" data-nav="chat"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 10h8M8 14h5M21 12a9 9 0 11-3.5-7.1L21 5v7z"/></svg> Chat</a>
+        <a class="nav-link" href="notifications.html" data-nav="notifications"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0"/></svg> Notifications</a>
+        <a class="nav-link" href="profile.html" data-nav="profile"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"/></svg> Profile</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="nav-link w-full" type="button" onclick="CS.logout('../index.html')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 12H4m0 0l3-3m-3 3l3 3m5-10h5a2 2 0 012 2v12a2 2 0 01-2 2h-5"/></svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Menu">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div>
+            <div class="font-semibold text-navy" id="topbar-name">Trader</div>
+            <div class="text-xs text-muted">Describe your cargo</div>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-body">
+        <h1 class="page-title">Cargo Details</h1>
+        <p class="page-sub" id="vehicle-sub">Enter dimensions and requirements so we can validate fit against the selected vehicle.</p>
+
+        <div class="grid-2" style="align-items:start">
+          <form id="cargo-form" class="card" novalidate>
+            <h2 class="card-title mb-4">Shipment information</h2>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="cargoName">Cargo Name</label>
+                <input class="form-input" id="cargoName" required placeholder="Cotton Fabrics" />
+                <div class="form-error">Required</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cargoCategory">Category</label>
+                <select class="form-select" id="cargoCategory" required>
+                  <option value="">Select</option>
+                  <option>Textiles</option>
+                  <option>Apparel</option>
+                  <option>Food</option>
+                  <option>Agriculture</option>
+                  <option>Electronics</option>
+                  <option>General</option>
+                </select>
+                <div class="form-error">Required</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="length">Length (m)</label>
+                <input class="form-input" type="number" id="length" step="0.01" min="0" placeholder="1.2" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="width">Width (m)</label>
+                <input class="form-input" type="number" id="width" step="0.01" min="0" placeholder="0.8" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="height">Height (m)</label>
+                <input class="form-input" type="number" id="height" step="0.01" min="0" placeholder="1.0" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cbm">CBM (auto)</label>
+                <input class="form-input" type="number" id="cbm" step="0.001" min="0.1" required placeholder="Calculated or enter" />
+                <div class="form-hint">L × W × H auto-calculates CBM</div>
+                <div class="form-error">Required</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="weight">Weight (KG)</label>
+              <input class="form-input" type="number" id="weight" min="1" required placeholder="350" />
+              <div class="form-error">Required</div>
+            </div>
+
+            <div class="form-label">Special requirements</div>
+            <div class="filters-row mb-4">
+              <label class="filter-chip"><input type="checkbox" id="fragile" style="margin-right:6px" /> Fragile</label>
+              <label class="filter-chip"><input type="checkbox" id="tempControlled" style="margin-right:6px" /> Temp Controlled</label>
+              <label class="filter-chip"><input type="checkbox" id="hazardous" style="margin-right:6px" /> Hazardous</label>
+              <label class="filter-chip"><input type="checkbox" id="special" style="margin-right:6px" /> Special Handling</label>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="from">From (city)</label>
+                <input class="form-input" id="from" required placeholder="Erode" />
+                <div class="form-error">Required</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="to">To (city)</label>
+                <input class="form-input" id="to" required placeholder="Chennai" />
+                <div class="form-error">Required</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="pickup">Pickup Location</label>
+              <input class="form-input" id="pickup" required placeholder="Erode Warehouse, Trichy Road" />
+              <div class="form-error">Required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="delivery">Delivery Location</label>
+              <input class="form-input" id="delivery" required placeholder="Chennai Port CFS" />
+              <div class="form-error">Required</div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="pickupDate">Pickup Date</label>
+                <input class="form-input" type="date" id="pickupDate" required />
+                <div class="form-error">Required</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="deliveryDate">Delivery Date</label>
+                <input class="form-input" type="date" id="deliveryDate" />
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg mt-2">Check Booking</button>
+          </form>
+
+          <div>
+            <div class="card mb-4" id="vehicle-summary"></div>
+            <div class="card" id="validation-card">
+              <h2 class="card-title mb-2">Booking validation</h2>
+              <p class="text-sm text-muted mb-4">All 8 checks must pass before you can proceed to confirmation.</p>
+              <div class="validation-list" id="validation-list">
+                <div class="notice notice-info">Fill the form and click <strong>Check Booking</strong> to run validation.</div>
+              </div>
+              <a id="proceed-btn" class="btn btn-success btn-block mt-4 hidden" href="booking-confirmation.html">Proceed to Confirmation</a>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/trader.js"></script>
+  <script>
+    const session = CS.requireRole("trader", "login.html");
+    if (session) {
+      CS.initSidebar();
+      CS.setActiveNav("search");
+      document.getElementById("topbar-name").textContent = session.name || "Trader";
+
+      const vehicleId = new URLSearchParams(location.search).get("vehicle");
+      const vehicle = CS.getVehicle(vehicleId);
+      if (!vehicle) {
+        CS.toast("Select a vehicle first", "warning");
+        setTimeout(() => (location.href = "search-space.html"), 800);
+      } else {
+        document.getElementById("vehicle-sub").textContent =
+          vehicle.providerName + " · " + vehicle.vehicleNumber + " · " + CS.formatRoute(vehicle.route);
+        document.getElementById("vehicle-summary").innerHTML = `
+          <h2 class="card-title mb-3">Selected vehicle</h2>
+          <div class="font-semibold text-navy">${vehicle.providerName}</div>
+          <div class="text-sm text-muted mb-3">${vehicle.vehicleType} · ${vehicle.vehicleNumber}</div>
+          <div class="route-line text-sm mb-3">${CS.formatRoute(vehicle.route)}</div>
+          <div class="grid-3">
+            <div><div class="info-label">Avail CBM</div><div class="info-value">${vehicle.availableCbm}</div></div>
+            <div><div class="info-label">Weight</div><div class="info-value">${vehicle.availableWeight} KG</div></div>
+            <div><div class="info-label">Rate</div><div class="info-value">${CS.formatINR(vehicle.pricePerCbm)}</div></div>
+          </div>`;
+        document.getElementById("from").value = vehicle.route[0] || "";
+        document.getElementById("to").value = vehicle.route[vehicle.route.length - 1] || "";
+        document.getElementById("pickupDate").value = vehicle.departureDate || "";
+        document.getElementById("deliveryDate").value = vehicle.etaDate || "";
+      }
+
+      const draft = TraderApp.getCargoDraft();
+      if (draft && draft.vehicleId === vehicleId) {
+        ["cargoName","cargoCategory","length","width","height","cbm","weight","from","to","pickup","delivery","pickupDate","deliveryDate"].forEach((k) => {
+          if (draft[k] != null && document.getElementById(k)) document.getElementById(k).value = draft[k];
+        });
+        ["fragile","tempControlled","hazardous","special"].forEach((k) => {
+          if (document.getElementById(k)) document.getElementById(k).checked = !!draft[k];
+        });
+      }
+
+      function recalcCbm() {
+        const cbm = TraderApp.calcCbm(
+          document.getElementById("length").value,
+          document.getElementById("width").value,
+          document.getElementById("height").value
+        );
+        if (cbm > 0) document.getElementById("cbm").value = cbm;
+      }
+      ["length", "width", "height"].forEach((id) =>
+        document.getElementById(id).addEventListener("input", recalcCbm)
+      );
+
+      function collectCargo() {
+        return {
+          vehicleId,
+          cargoName: document.getElementById("cargoName").value.trim(),
+          cargoCategory: document.getElementById("cargoCategory").value,
+          length: document.getElementById("length").value,
+          width: document.getElementById("width").value,
+          height: document.getElementById("height").value,
+          cbm: Number(document.getElementById("cbm").value),
+          weight: Number(document.getElementById("weight").value),
+          fragile: document.getElementById("fragile").checked,
+          tempControlled: document.getElementById("tempControlled").checked,
+          hazardous: document.getElementById("hazardous").checked,
+          special: document.getElementById("special").checked,
+          from: document.getElementById("from").value.trim(),
+          to: document.getElementById("to").value.trim(),
+          pickup: document.getElementById("pickup").value.trim(),
+          delivery: document.getElementById("delivery").value.trim(),
+          pickupDate: document.getElementById("pickupDate").value,
+          deliveryDate: document.getElementById("deliveryDate").value,
+        };
+      }
+
+      document.getElementById("cargo-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (!vehicle) return;
+        if (!CS.validateRequired(this)) {
+          CS.toast("Please complete required cargo fields", "error");
+          return;
+        }
+        const cargo = collectCargo();
+        TraderApp.saveCargoDraft(cargo);
+
+        const { checks, allPass } = CS.validateBooking(vehicle, cargo);
+        const list = document.getElementById("validation-list");
+        list.innerHTML = checks
+          .map(
+            (c) => `
+          <div class="validation-item ${c.pass ? "pass" : "fail"}">
+            <div class="validation-icon">${c.pass ? "✓" : "✕"}</div>
+            <div>
+              <div class="font-semibold text-sm">${c.label}</div>
+              <div class="text-xs text-muted">${c.detail}</div>
+            </div>
+          </div>`
+          )
+          .join("");
+
+        const proceed = document.getElementById("proceed-btn");
+        if (allPass) {
+          const settings = CS.getSettings();
+          const base = cargo.cbm * vehicle.pricePerCbm;
+          const fee = Math.round(base * ((settings.serviceFeePercent || 10) / 100));
+          TraderApp.savePendingBooking({
+            ...cargo,
+            providerName: vehicle.providerName,
+            vehicleNumber: vehicle.vehicleNumber,
+            route: vehicle.route,
+            pricePerCbm: vehicle.pricePerCbm,
+            amount: base,
+            serviceFee: fee,
+            total: base + fee,
+            bookingPreviewId: CS.bookingId(),
+          });
+          proceed.classList.remove("hidden");
+          CS.toast("All checks passed — you can proceed", "success");
+        } else {
+          proceed.classList.add("hidden");
+          CS.toast("Some checks failed — adjust cargo details", "warning");
+        }
+      });
+    }
+  </script>
+</body>
+</html>

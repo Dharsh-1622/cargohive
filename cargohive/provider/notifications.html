@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications — Provider</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a></div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" data-nav="dashboard" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-nav="vehicles" href="vehicles.html"><span>🚛</span> My Vehicles</a>
+        <a class="nav-link" data-nav="add-vehicle" href="add-vehicle.html"><span>➕</span> Add Vehicle</a>
+        <a class="nav-link" data-nav="availability" href="availability.html"><span>📐</span> Availability</a>
+        <a class="nav-link" data-nav="bookings" href="bookings.html"><span>📋</span> Bookings</a>
+        <a class="nav-link" data-nav="chat" href="chat.html"><span>💬</span> Messages</a>
+        <a class="nav-link" data-nav="notifications" href="notifications.html"><span>🔔</span> Notifications</a>
+        <a class="nav-link" data-nav="profile" href="profile.html"><span>👤</span> Profile</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn btn-ghost btn-block" style="color:rgba(255,255,255,0.8);justify-content:flex-start" onclick="CS.logout('../index.html')">Logout</button></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle">☰</button>
+          <div class="page-title" style="font-size:1.25rem;margin:0">Notifications</div></div>
+        <button class="btn btn-secondary btn-sm" id="mark">Mark all as read</button>
+      </header>
+      <main class="page-body"><div class="card" style="padding:0" id="list"></div></main>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/provider.js"></script>
+  <script>
+    const session = CS.requireRole('provider', 'login.html');
+    if (session) {
+      CS.initSidebar(); CS.setActiveNav('notifications');
+      const list = document.getElementById('list');
+      function refresh() { ProviderApp.renderNotifications(list); }
+      refresh();
+      document.getElementById('mark').onclick = () => { ProviderApp.markAllRead(); refresh(); };
+    }
+  </script>
+</body>
+</html>

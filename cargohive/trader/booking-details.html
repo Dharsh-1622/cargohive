@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Details — CargoHive</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a></div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" data-nav="dashboard" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-nav="search" href="search-space.html"><span>🔍</span> Find Cargo Space</a>
+        <a class="nav-link" data-nav="bookings" href="bookings.html"><span>📋</span> My Bookings</a>
+        <a class="nav-link" data-nav="chat" href="chat.html"><span>💬</span> Messages</a>
+        <a class="nav-link" data-nav="notifications" href="notifications.html"><span>🔔</span> Notifications</a>
+        <a class="nav-link" data-nav="profile" href="profile.html"><span>👤</span> Profile</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn btn-ghost btn-block" style="color:rgba(255,255,255,0.8);justify-content:flex-start" onclick="CS.logout('../index.html')">Logout</button></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle">☰</button>
+          <div class="page-title" style="font-size:1.25rem;margin:0">Booking Details</div></div>
+        <a href="bookings.html" class="btn btn-secondary btn-sm">← Back</a>
+      </header>
+      <main class="page-body" id="content"></main>
+    </div>
+  </div>
+  <div class="modal-overlay" id="cancel-modal">
+    <div class="modal">
+      <h3 class="modal-title">Cancel booking?</h3>
+      <div class="modal-body">This will free capacity back to the provider. Refunds are simulated in this demo.</div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="CS.closeModal('cancel-modal')">Keep Booking</button>
+        <button class="btn btn-danger" id="confirm-cancel">Cancel Booking</button>
+      </div>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/trader.js"></script>
+  <script>
+    const session = CS.requireRole('trader', 'login.html');
+    if (session) {
+      CS.initSidebar(); CS.setActiveNav('bookings');
+      const id = new URLSearchParams(location.search).get('id');
+      const b = CS.getBooking(id) || CS.getBookings()[0];
+      const el = document.getElementById('content');
+      if (!b) el.innerHTML = '<div class="empty-state"><p>Booking not found</p></div>';
+      else {
+        el.innerHTML = `
+          <div class="grid-2" style="align-items:start">
+            <div class="card">
+              <div class="flex-between mb-4"><div><h2 class="card-title" style="margin:0">${b.id}</h2><div class="text-sm text-muted mt-1">${b.providerName}</div></div>${CS.statusBadge(b.status)}</div>
+              <div class="route-line mb-4">${CS.formatRoute(b.route)}</div>
+              <div class="info-grid">
+                <div><div class="info-label">Cargo</div><div class="info-value">${b.cargoName}</div></div>
+                <div><div class="info-label">Category</div><div class="info-value">${b.cargoCategory}</div></div>
+                <div><div class="info-label">CBM</div><div class="info-value">${b.cbm}</div></div>
+                <div><div class="info-label">Weight</div><div class="info-value">${b.weight} KG</div></div>
+                <div><div class="info-label">Vehicle</div><div class="info-value">${b.vehicleNumber}</div></div>
+                <div><div class="info-label">Payment</div><div class="info-value">${CS.statusBadge(b.paymentStatus)} ${b.paymentMethod||''}</div></div>
+                <div><div class="info-label">Pickup</div><div class="info-value text-sm">${b.pickup}<br/>${b.pickupDate}</div></div>
+                <div><div class="info-label">Delivery</div><div class="info-value text-sm">${b.delivery}<br/>${b.deliveryDate}</div></div>
+                <div><div class="info-label">Amount</div><div class="info-value">${CS.formatINR(b.total)}</div></div>
+                <div><div class="info-label">Txn ID</div><div class="info-value text-sm">${b.txnId||'—'}</div></div>
+              </div>
+              <div class="flex gap-2 mt-6" style="flex-wrap:wrap">
+                <a class="btn btn-outline" href="chat.html">Chat</a>
+                <button class="btn btn-secondary" id="receipt">Download Receipt</button>
+                ${['Delivered','Cancelled'].includes(b.status)?'':`<button class="btn btn-danger" id="cancel-btn">Cancel Booking</button>`}
+              </div>
+            </div>
+            <div class="card">
+              <h3 class="card-title mb-4">Shipment timeline</h3>
+              <div class="timeline">
+                ${(b.timeline||[]).map(t => `
+                  <div class="timeline-item ${t.done?'done':''} ${t.active?'active':''}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-title">${t.step}</div>
+                    <div class="timeline-meta">${t.at||''}</div>
+                  </div>`).join('')}
+              </div>
+            </div>
+          </div>`;
+        document.getElementById('receipt')?.addEventListener('click', () => CS.toast('Receipt downloaded (demo PDF)', 'success'));
+        document.getElementById('cancel-btn')?.addEventListener('click', () => CS.openModal('cancel-modal'));
+        document.getElementById('confirm-cancel')?.addEventListener('click', () => {
+          TraderApp.cancelBooking(b.id);
+          CS.closeModal('cancel-modal');
+          setTimeout(() => location.reload(), 500);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

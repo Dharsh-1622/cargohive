@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vehicle Details — CargoHive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { cs: { navy: '#0b1f3a', blue: '#1d4ed8', sky: '#0ea5e9' } },
+          fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <a href="../index.html" class="cs-logo cs-logo-white">
+          <span class="cs-logo-mark">CH</span>
+          <span>CargoHive</span>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="dashboard.html" data-nav="dashboard"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 5h7v7H4V5zm9 0h7v5h-7V5zM4 14h7v5H4v-5zm9 2h7v3h-7v-3z"/></svg> Dashboard</a>
+        <a class="nav-link" href="search-space.html" data-nav="search"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-width="2" d="M20 20l-3-3"/></svg> Search Space</a>
+        <a class="nav-link" href="bookings.html" data-nav="bookings"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7h8M8 11h8M8 15h5M6 3h12a2 2 0 012 2v14l-4-2-4 2-4-2-4 2V5a2 2 0 012-2z"/></svg> Bookings</a>
+        <a class="nav-link" href="chat.html" data-nav="chat"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 10h8M8 14h5M21 12a9 9 0 11-3.5-7.1L21 5v7z"/></svg> Chat</a>
+        <a class="nav-link" href="notifications.html" data-nav="notifications"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0"/></svg> Notifications</a>
+        <a class="nav-link" href="profile.html" data-nav="profile"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"/></svg> Profile</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="nav-link w-full" type="button" onclick="CS.logout('../index.html')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 12H4m0 0l3-3m-3 3l3 3m5-10h5a2 2 0 012 2v12a2 2 0 01-2 2h-5"/></svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Menu">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div>
+            <div class="font-semibold text-navy" id="topbar-name">Trader</div>
+            <div class="text-xs text-muted">Vehicle details</div>
+          </div>
+        </div>
+        <a href="search-space.html" class="btn btn-secondary btn-sm">← Back to search</a>
+      </header>
+
+      <main class="page-body" id="detail-root">
+        <div class="empty-state"><div class="loading-spinner"></div><p class="mt-4">Loading vehicle…</p></div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/trader.js"></script>
+  <script>
+    const session = CS.requireRole("trader", "login.html");
+    if (session) {
+      CS.initSidebar();
+      CS.setActiveNav("search");
+      document.getElementById("topbar-name").textContent = session.name || "Trader";
+
+      const id = new URLSearchParams(location.search).get("id");
+      const v = CS.getVehicle(id);
+      const root = document.getElementById("detail-root");
+
+      if (!v) {
+        root.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🚛</div><p>Vehicle not found.</p><a class="btn btn-primary mt-4" href="search-space.html">Search again</a></div>';
+      } else {
+        const occupied = v.totalCbm - v.availableCbm;
+        const pct = Math.round((occupied / v.totalCbm) * 100);
+        root.innerHTML = `
+          <div class="flex-between mb-4" style="flex-wrap:wrap;gap:12px">
+            <div>
+              <h1 class="page-title" style="margin-bottom:4px">${v.providerName}</h1>
+              <p class="page-sub" style="margin:0">${v.vehicleType} · ${v.vehicleNumber} ${v.verified ? '<span class="badge badge-verified">Verified ✓</span>' : ""} ${CS.statusBadge(v.status)}</p>
+            </div>
+            <a class="btn btn-primary btn-lg" href="cargo-details.html?vehicle=${v.id}">Book This Space</a>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <h2 class="card-title mb-4">Route &amp; Schedule</h2>
+              <div class="route-line mb-4">${CS.formatRoute(v.route)}</div>
+              <div class="grid-2" style="gap:12px">
+                <div><div class="info-label">Departure</div><div class="info-value">${v.departureDate} · ${v.departureTime}</div></div>
+                <div><div class="info-label">ETA</div><div class="info-value">${v.etaDate} · ${v.etaTime}</div></div>
+                <div><div class="info-label">Rating</div><div class="info-value stars">${v.rating} ★</div></div>
+                <div><div class="info-label">Price</div><div class="info-value price-tag">${CS.formatINR(v.pricePerCbm)} <span class="text-sm text-muted font-semibold">/ CBM</span></div></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title mb-4">Capacity</h2>
+              <div class="grid-3 mb-4">
+                <div><div class="info-label">Total CBM</div><div class="info-value">${v.totalCbm}</div></div>
+                <div><div class="info-label">Available</div><div class="info-value" style="color:var(--cs-success)">${v.availableCbm}</div></div>
+                <div><div class="info-label">Weight free</div><div class="info-value">${v.availableWeight} KG</div></div>
+              </div>
+              <div class="capacity-bar mb-2"><div class="capacity-filled" style="width:${pct}%"></div></div>
+              <div class="text-xs text-muted flex-between"><span>Occupied ${occupied} CBM</span><span>Max weight ${v.maxWeight} KG</span></div>
+            </div>
+          </div>
+
+          <div class="card mt-4">
+            <h2 class="card-title mb-4">Capabilities</h2>
+            <div class="filters-row">
+              <span class="badge ${v.tempControlled ? "badge-info" : "badge-slate"}">Temp controlled: ${v.tempControlled ? "Yes" : "No"}</span>
+              <span class="badge ${v.refrigerated ? "badge-info" : "badge-slate"}">Refrigerated: ${v.refrigerated ? "Yes" : "No"}</span>
+              <span class="badge ${v.fragileSupported ? "badge-success" : "badge-slate"}">Fragile: ${v.fragileSupported ? "Supported" : "No"}</span>
+              <span class="badge ${v.hazardousAllowed ? "badge-warning" : "badge-slate"}">Hazardous: ${v.hazardousAllowed ? "Allowed" : "Not allowed"}</span>
+            </div>
+            <p class="text-sm text-muted mt-4">Share remaining space on this ${v.vehicleType} and pay only for the CBM your cargo occupies. Ideal for partial loads on the ${CS.formatRoute(v.route)} corridor.</p>
+            <div class="flex gap-2 mt-4">
+              <a class="btn btn-primary" href="cargo-details.html?vehicle=${v.id}">Book This Space</a>
+              <a class="btn btn-secondary" href="chat.html">Ask Provider</a>
+            </div>
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

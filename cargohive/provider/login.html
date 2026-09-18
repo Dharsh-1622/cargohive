@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provider Login — CargoHive</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-visual">
+      <a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a>
+      <div>
+        <h2 style="font-size:2rem;font-weight:700;margin:0 0 12px;letter-spacing:-0.03em">Your capacity.<br/>Their shipment.</h2>
+        <p style="opacity:0.75;line-height:1.6;max-width:340px">Fill empty CBM with verified trader bookings and grow every trip.</p>
+      </div>
+      <div class="text-sm" style="opacity:0.55">Demo: provider@gvtransport.com / provider123</div>
+    </div>
+    <div class="auth-form-wrap">
+      <div class="auth-card">
+        <h1 class="auth-title">Provider Login</h1>
+        <p class="auth-sub">Manage vehicles, capacity, and bookings.</p>
+        <form id="login-form">
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="email" required value="provider@gvtransport.com" /></div>
+          <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="password" required value="provider123" /></div>
+          <div class="flex-between mb-4">
+            <a href="#" id="forgot" class="text-sm" style="color:var(--cs-blue)">Forgot Password</a>
+          </div>
+          <button class="btn btn-primary btn-block btn-lg" type="submit">Login as Provider</button>
+        </form>
+        <p class="text-sm text-muted mt-4" style="text-align:center"><a href="signup.html" style="color:var(--cs-blue);font-weight:600">Create Provider Account</a></p>
+        <div class="divider"></div>
+        <a href="../trader/login.html" class="btn btn-secondary btn-block">Continue as Trader</a>
+      </div>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/provider.js"></script>
+  <script>
+    document.getElementById('forgot').onclick = (e) => { e.preventDefault(); CS.toast('Reset link sent (demo)', 'info'); };
+    document.getElementById('login-form').onsubmit = (e) => {
+      e.preventDefault();
+      ProviderApp.login(email.value.trim(), password.value);
+    };
+  </script>
+</body>
+</html>

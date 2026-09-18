@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Trader Account — CargoHive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { cs: { navy: '#0b1f3a', blue: '#1d4ed8', sky: '#0ea5e9' } },
+          fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-visual">
+      <a href="../index.html" class="cs-logo cs-logo-white">
+        <span class="cs-logo-mark">CH</span>
+        <span>CargoHive</span>
+      </a>
+      <div>
+        <h2 style="font-size:2rem;font-weight:700;letter-spacing:-0.03em;margin:0 0 12px;line-height:1.2">Join India's shared cargo network.</h2>
+        <p style="opacity:0.8;line-height:1.6;max-width:360px;margin:0">Exporters, importers, and manufacturers book leftover truck space — lower cost, faster dispatch, verified partners.</p>
+        <ul style="margin:24px 0 0;padding:0;list-style:none;opacity:0.85;line-height:2">
+          <li>✓ Instant route discovery across Tamil Nadu &amp; South India</li>
+          <li>✓ Automatic CBM &amp; weight validation</li>
+          <li>✓ Secure mock payments &amp; booking timeline</li>
+        </ul>
+      </div>
+      <div class="text-sm" style="opacity:0.6">Already shipping with us? Sign in anytime.</div>
+    </div>
+
+    <div class="auth-form-wrap">
+      <div class="auth-card wide">
+        <h1 class="auth-title">Create Trader Account</h1>
+        <p class="auth-sub">Tell us about your business so we can match the right cargo space.</p>
+
+        <form id="signup-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="fullName">Full Name</label>
+              <input class="form-input" id="fullName" required placeholder="Dharshan Kumar" />
+              <div class="form-error">Full name is required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="email">Email</label>
+              <input class="form-input" type="email" id="email" required placeholder="you@business.in" />
+              <div class="form-error">Email is required</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="phone">Phone</label>
+              <input class="form-input" id="phone" required placeholder="+91 98700 11122" />
+              <div class="form-error">Phone is required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="businessName">Business Name</label>
+              <input class="form-input" id="businessName" required placeholder="DK Exports" />
+              <div class="form-error">Business name is required</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="businessType">Business Type</label>
+              <select class="form-select" id="businessType" required>
+                <option value="">Select type</option>
+                <option value="Exporter">Exporter</option>
+                <option value="Importer">Importer</option>
+                <option value="Trader">Trader</option>
+                <option value="Manufacturer">Manufacturer</option>
+              </select>
+              <div class="form-error">Business type is required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="gst">GST Number <span class="text-muted">(optional)</span></label>
+              <input class="form-input" id="gst" placeholder="33AABCD1234F1Z7" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="address">Business Address</label>
+            <textarea class="form-textarea" id="address" rows="2" required placeholder="15 Bazaar Street, Erode"></textarea>
+            <div class="form-error">Address is required</div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="city">City</label>
+              <input class="form-input" id="city" required placeholder="Erode" />
+              <div class="form-error">City is required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="state">State</label>
+              <input class="form-input" id="state" required placeholder="Tamil Nadu" />
+              <div class="form-error">State is required</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="password">Password</label>
+              <input class="form-input" type="password" id="password" required placeholder="Min 6 characters" minlength="6" />
+              <div class="form-error">Password is required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="confirmPassword">Confirm Password</label>
+              <input class="form-input" type="password" id="confirmPassword" required placeholder="Re-enter password" />
+              <div class="form-error">Confirm your password</div>
+            </div>
+          </div>
+          <label class="form-check">
+            <input type="checkbox" id="terms" required />
+            <span>I agree to CargoHive Terms of Service and Privacy Policy for shared cargo bookings.</span>
+          </label>
+          <div class="form-error" id="terms-error" style="margin-top:-8px;margin-bottom:12px">You must accept the terms</div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg">Create Trader Account</button>
+        </form>
+
+        <p class="text-sm text-muted mt-4" style="text-align:center">
+          Already have an account?
+          <a href="login.html" style="color:var(--cs-blue);font-weight:600">Login</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/trader.js"></script>
+  <script>
+    document.getElementById("signup-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const terms = document.getElementById("terms");
+      const termsErr = document.getElementById("terms-error");
+      if (!terms.checked) {
+        termsErr.classList.add("show");
+        CS.toast("Please accept the terms to continue", "error");
+        return;
+      }
+      termsErr.classList.remove("show");
+      if (!CS.validateRequired(this)) {
+        CS.toast("Please fill in all required fields", "error");
+        return;
+      }
+      TraderApp.signup({
+        fullName: document.getElementById("fullName").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        businessName: document.getElementById("businessName").value.trim(),
+        businessType: document.getElementById("businessType").value,
+        gst: document.getElementById("gst").value.trim(),
+        address: document.getElementById("address").value.trim(),
+        city: document.getElementById("city").value.trim(),
+        state: document.getElementById("state").value.trim(),
+        password: document.getElementById("password").value,
+        confirmPassword: document.getElementById("confirmPassword").value,
+      });
+    });
+  </script>
+</body>
+</html>

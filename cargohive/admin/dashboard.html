@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — CargoHive</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar admin-sidebar" id="sidebar">
+      <div class="sidebar-brand"><a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a>
+        <div class="text-xs mt-2" style="opacity:0.5;padding-left:46px">Admin Console</div>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" data-nav="dashboard" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-nav="approvals" href="provider-approvals.html"><span>✓</span> Provider Approvals</a>
+        <a class="nav-link" data-nav="providers" href="providers.html"><span>🚛</span> Providers</a>
+        <a class="nav-link" data-nav="traders" href="traders.html"><span>📦</span> Traders</a>
+        <a class="nav-link" data-nav="vehicles" href="vehicles.html"><span>🚚</span> Vehicles</a>
+        <a class="nav-link" data-nav="bookings" href="bookings.html"><span>📋</span> Bookings</a>
+        <a class="nav-link" data-nav="reports" href="reports.html"><span>📈</span> Reports</a>
+        <a class="nav-link" data-nav="settings" href="settings.html"><span>⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn btn-ghost btn-block" style="color:rgba(255,255,255,0.8);justify-content:flex-start" onclick="CS.logout('../index.html')">Logout</button></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle">☰</button>
+          <div class="page-title" style="font-size:1.25rem;margin:0">Platform Overview</div></div>
+        <div class="badge badge-info">Admin</div>
+      </header>
+      <main class="page-body">
+        <div class="stats-grid" id="stats" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))"></div>
+        <div class="grid-2 mb-6" style="align-items:start">
+          <div class="card">
+            <h3 class="card-title mb-4">Booking Activity</h3>
+            <div class="bar-chart" id="booking-chart"></div>
+          </div>
+          <div class="card">
+            <h3 class="card-title mb-4">Provider Verification Overview</h3>
+            <div id="provider-overview"></div>
+          </div>
+        </div>
+        <div class="grid-2 mb-6" style="align-items:start">
+          <div class="card">
+            <h3 class="card-title mb-4">Vehicle Capacity Overview</h3>
+            <div id="capacity-overview"></div>
+          </div>
+          <div class="card">
+            <h3 class="card-title mb-4">Recent Provider Registrations</h3>
+            <div id="recent-providers"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="flex-between mb-4"><h3 class="card-title" style="margin:0">Recent Bookings</h3><a href="bookings.html" class="btn btn-ghost btn-sm">View all</a></div>
+          <div id="recent-bookings"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/admin.js"></script>
+  <script>
+    const session = CS.requireRole('admin', 'login.html');
+    if (session) {
+      CS.initSidebar(); CS.setActiveNav('dashboard');
+      const s = AdminApp.platformStats();
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Traders</div><div class="stat-value">${s.traders}</div></div>
+        <div class="stat-card"><div class="stat-label">Providers</div><div class="stat-value">${s.providers}</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Approvals</div><div class="stat-value">${s.pending}</div></div>
+        <div class="stat-card"><div class="stat-label">Active Vehicles</div><div class="stat-value">${s.activeVehicles}</div></div>
+        <div class="stat-card"><div class="stat-label">Active Bookings</div><div class="stat-value">${s.activeBookings}</div></div>
+        <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value">${s.completed}</div></div>
+        <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value" style="font-size:1.25rem">${CS.formatINR(s.revenue)}</div></div>`;
+      const report = AdminApp.reportData();
+      const max = Math.max(...report.monthly, 1);
+      document.getElementById('booking-chart').innerHTML = report.months.map((m,i) => `
+        <div class="bar-col"><div class="bar-fill" style="height:${Math.round(report.monthly[i]/max*100)}%"></div><div class="bar-label">${m}</div></div>`).join('');
+      const providers = CS.getProviders();
+      const counts = { Approved:0, Pending:0, Rejected:0, Suspended:0 };
+      providers.forEach(p => { counts[p.status] = (counts[p.status]||0)+1; });
+      document.getElementById('provider-overview').innerHTML = Object.entries(counts).map(([k,v]) => `
+        <div class="hbar"><div class="hbar-label">${k}</div><div class="hbar-track"><div class="hbar-fill" style="width:${Math.round(v/Math.max(providers.length,1)*100)}%"></div></div><div class="text-sm font-semibold">${v}</div></div>`).join('');
+      const vehicles = CS.getVehicles();
+      document.getElementById('capacity-overview').innerHTML = vehicles.slice(0,5).map(v => {
+        const pct = Math.round(((v.totalCbm-v.availableCbm)/v.totalCbm)*100);
+        return `<div class="hbar"><div class="hbar-label">${v.vehicleNumber}</div><div class="hbar-track"><div class="hbar-fill" style="width:${pct}%"></div></div><div class="text-xs">${v.availableCbm}/${v.totalCbm}</div></div>`;
+      }).join('');
+      document.getElementById('recent-providers').innerHTML = providers.slice().sort((a,b)=>b.joined.localeCompare(a.joined)).slice(0,4).map(p => `
+        <div class="flex-between" style="padding:10px 0;border-bottom:1px solid var(--cs-slate-100)">
+          <div><div class="font-semibold text-sm">${p.companyName}</div><div class="text-xs text-muted">${p.city} · ${p.joined}</div></div>
+          ${CS.statusBadge(p.status)}
+        </div>`).join('');
+      AdminApp.renderBookings(document.getElementById('recent-bookings'), 'All');
+      // show only first few - table already full, ok for demo
+    }
+  </script>
+</body>
+</html>

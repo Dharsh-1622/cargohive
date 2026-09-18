@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register as Provider — CargoHive</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-visual">
+      <a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a>
+      <div>
+        <h2 style="font-size:1.75rem;font-weight:700;margin:0 0 12px">Monetize empty capacity</h2>
+        <p style="opacity:0.75">Publish unused space after admin verification.</p>
+      </div>
+      <div></div>
+    </div>
+    <div class="auth-form-wrap">
+      <div class="auth-card wide" id="form-card">
+        <h1 class="auth-title">Register as Logistics Provider</h1>
+        <p class="auth-sub">Submit your company details for platform review.</p>
+        <div class="notice notice-warning mb-4">Provider accounts require Admin verification before publishing cargo availability.</div>
+        <form id="signup-form">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Company Name</label><input class="form-input" id="companyName" required /><div class="form-error">Required</div></div>
+            <div class="form-group"><label class="form-label">Owner / Contact Person</label><input class="form-input" id="contactPerson" required /><div class="form-error">Required</div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="email" required /><div class="form-error">Required</div></div>
+            <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="phone" required /><div class="form-error">Required</div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Business Type</label>
+              <select class="form-select" id="businessType" required>
+                <option value="">Select</option>
+                <option>Transport Company</option>
+                <option>Truck Operator</option>
+                <option>Freight Forwarder</option>
+                <option>Shipping Company</option>
+                <option>Rail Logistics</option>
+                <option>Air Cargo</option>
+              </select>
+              <div class="form-error">Required</div>
+            </div>
+            <div class="form-group"><label class="form-label">GST Number</label><input class="form-input" id="gst" required /><div class="form-error">Required</div></div>
+          </div>
+          <div class="form-group"><label class="form-label">Business Address</label><input class="form-input" id="address" required /><div class="form-error">Required</div></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">City</label><input class="form-input" id="city" required /><div class="form-error">Required</div></div>
+            <div class="form-group"><label class="form-label">State</label><input class="form-input" id="state" required value="Tamil Nadu" /><div class="form-error">Required</div></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="password" required /><div class="form-error">Required</div></div>
+            <div class="form-group"><label class="form-label">Confirm Password</label><input class="form-input" type="password" id="confirmPassword" required /><div class="form-error">Required</div></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg">Submit Registration</button>
+        </form>
+        <p class="text-sm text-muted mt-4" style="text-align:center">Already registered? <a href="login.html" style="color:var(--cs-blue);font-weight:600">Login</a></p>
+      </div>
+      <div class="auth-card wide hidden" id="success-card">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--cs-success-bg);color:var(--cs-success);display:grid;place-items:center;font-size:1.75rem;font-weight:700;margin-bottom:16px">✓</div>
+        <h1 class="auth-title">Registration submitted</h1>
+        <p class="auth-sub">Registration submitted for Admin verification. You can log in, but publishing availability requires approval.</p>
+        <a href="login.html" class="btn btn-primary btn-block">Go to Login</a>
+      </div>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/provider.js"></script>
+  <script>
+    document.getElementById('signup-form').onsubmit = (e) => {
+      e.preventDefault();
+      if (!CS.validateRequired(e.target)) { CS.toast('Please fill required fields', 'error'); return; }
+      const ok = ProviderApp.signup({
+        companyName: companyName.value.trim(), contactPerson: contactPerson.value.trim(),
+        email: email.value.trim(), phone: phone.value.trim(), businessType: businessType.value,
+        gst: gst.value.trim(), address: address.value.trim(), city: city.value.trim(), state: state.value.trim(),
+        password: password.value, confirmPassword: confirmPassword.value,
+      });
+      if (ok) {
+        document.getElementById('form-card').classList.add('hidden');
+        document.getElementById('success-card').classList.remove('hidden');
+      }
+    };
+  </script>
+</body>
+</html>

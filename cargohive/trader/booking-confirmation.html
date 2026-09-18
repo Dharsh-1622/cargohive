@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Confirmation — CargoHive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { cs: { navy: '#0b1f3a', blue: '#1d4ed8', sky: '#0ea5e9' } },
+          fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <a href="../index.html" class="cs-logo cs-logo-white">
+          <span class="cs-logo-mark">CH</span>
+          <span>CargoHive</span>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="dashboard.html" data-nav="dashboard"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 5h7v7H4V5zm9 0h7v5h-7V5zM4 14h7v5H4v-5zm9 2h7v3h-7v-3z"/></svg> Dashboard</a>
+        <a class="nav-link" href="search-space.html" data-nav="search"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-width="2" d="M20 20l-3-3"/></svg> Search Space</a>
+        <a class="nav-link" href="bookings.html" data-nav="bookings"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7h8M8 11h8M8 15h5M6 3h12a2 2 0 012 2v14l-4-2-4 2-4-2-4 2V5a2 2 0 012-2z"/></svg> Bookings</a>
+        <a class="nav-link" href="chat.html" data-nav="chat"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 10h8M8 14h5M21 12a9 9 0 11-3.5-7.1L21 5v7z"/></svg> Chat</a>
+        <a class="nav-link" href="notifications.html" data-nav="notifications"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0"/></svg> Notifications</a>
+        <a class="nav-link" href="profile.html" data-nav="profile"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"/></svg> Profile</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="nav-link w-full" type="button" onclick="CS.logout('../index.html')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 12H4m0 0l3-3m-3 3l3 3m5-10h5a2 2 0 012 2v12a2 2 0 01-2 2h-5"/></svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Menu">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div>
+            <div class="font-semibold text-navy" id="topbar-name">Trader</div>
+            <div class="text-xs text-muted">Confirm booking</div>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-body">
+        <h1 class="page-title">Confirm your booking</h1>
+        <p class="page-sub">Review the summary before proceeding to secure mock payment.</p>
+
+        <div class="grid-2" style="align-items:start" id="confirm-root">
+          <div class="empty-state"><div class="loading-spinner"></div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/trader.js"></script>
+  <script>
+    const session = CS.requireRole("trader", "login.html");
+    if (session) {
+      CS.initSidebar();
+      CS.setActiveNav("bookings");
+      document.getElementById("topbar-name").textContent = session.name || "Trader";
+
+      const pending = TraderApp.getPendingBooking();
+      const root = document.getElementById("confirm-root");
+
+      if (!pending) {
+        root.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">📋</div><p>No pending booking found.</p><a class="btn btn-primary mt-4" href="search-space.html">Find Cargo Space</a></div>';
+      } else {
+        const feePct = CS.getSettings().serviceFeePercent || 10;
+        root.innerHTML = `
+          <div class="card">
+            <div class="flex-between mb-4">
+              <div>
+                <div class="text-xs text-muted">Booking ID preview</div>
+                <div class="font-bold text-navy" style="font-size:1.25rem">${pending.bookingPreviewId || "BK-PENDING"}</div>
+              </div>
+              <span class="badge badge-info">Awaiting payment</span>
+            </div>
+            <div class="route-line mb-4">${CS.formatRoute(pending.route)}</div>
+            <div class="grid-2" style="gap:14px">
+              <div><div class="info-label">Provider</div><div class="info-value">${pending.providerName}</div></div>
+              <div><div class="info-label">Vehicle</div><div class="info-value">${pending.vehicleNumber}</div></div>
+              <div><div class="info-label">Cargo</div><div class="info-value">${pending.cargoName}</div></div>
+              <div><div class="info-label">Category</div><div class="info-value">${pending.cargoCategory}</div></div>
+              <div><div class="info-label">Volume</div><div class="info-value">${pending.cbm} CBM</div></div>
+              <div><div class="info-label">Weight</div><div class="info-value">${pending.weight} KG</div></div>
+              <div><div class="info-label">Pickup</div><div class="info-value text-sm">${pending.pickup}<br/><span class="text-muted">${pending.pickupDate}</span></div></div>
+              <div><div class="info-label">Delivery</div><div class="info-value text-sm">${pending.delivery}<br/><span class="text-muted">${pending.deliveryDate || "—"}</span></div></div>
+            </div>
+            <div class="filters-row mt-4">
+              ${pending.fragile ? '<span class="badge badge-warning">Fragile</span>' : ""}
+              ${pending.tempControlled ? '<span class="badge badge-info">Temp controlled</span>' : ""}
+              ${pending.hazardous ? '<span class="badge badge-danger">Hazardous</span>' : ""}
+            </div>
+          </div>
+          <div class="card">
+            <h2 class="card-title mb-4">Price summary</h2>
+            <div class="flex-between mb-3"><span class="text-muted">Space (${pending.cbm} CBM × ${CS.formatINR(pending.pricePerCbm)})</span><strong>${CS.formatINR(pending.amount)}</strong></div>
+            <div class="flex-between mb-3"><span class="text-muted">Service fee (${feePct}%)</span><strong>${CS.formatINR(pending.serviceFee)}</strong></div>
+            <div style="border-top:1px solid var(--cs-slate-200);padding-top:14px;margin-top:8px" class="flex-between">
+              <span class="font-bold text-navy">Total</span>
+              <span class="price-tag">${CS.formatINR(pending.total)}</span>
+            </div>
+            <div class="notice notice-info mt-4">Demo checkout — no real money is charged. GST invoice will be available after payment in a full build.</div>
+            <div class="flex gap-2 mt-6" style="flex-wrap:wrap">
+              <a class="btn btn-primary btn-lg" href="payment.html">Proceed to Payment</a>
+              <a class="btn btn-secondary" href="cargo-details.html?vehicle=${pending.vehicleId}">Go Back</a>
+            </div>
+          </div>`;
+      }
+    }
+  </script>
+</body>
+</html>

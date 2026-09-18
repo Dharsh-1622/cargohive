@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Details — Provider</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a></div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" data-nav="dashboard" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-nav="vehicles" href="vehicles.html"><span>🚛</span> My Vehicles</a>
+        <a class="nav-link" data-nav="add-vehicle" href="add-vehicle.html"><span>➕</span> Add Vehicle</a>
+        <a class="nav-link" data-nav="availability" href="availability.html"><span>📐</span> Availability</a>
+        <a class="nav-link" data-nav="bookings" href="bookings.html"><span>📋</span> Bookings</a>
+        <a class="nav-link" data-nav="chat" href="chat.html"><span>💬</span> Messages</a>
+        <a class="nav-link" data-nav="notifications" href="notifications.html"><span>🔔</span> Notifications</a>
+        <a class="nav-link" data-nav="profile" href="profile.html"><span>👤</span> Profile</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn btn-ghost btn-block" style="color:rgba(255,255,255,0.8);justify-content:flex-start" onclick="CS.logout('../index.html')">Logout</button></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle">☰</button>
+          <div class="page-title" style="font-size:1.25rem;margin:0">Booking Details</div></div>
+        <a href="bookings.html" class="btn btn-secondary btn-sm">← Back</a>
+      </header>
+      <main class="page-body" id="content"></main>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/provider.js"></script>
+  <script>
+    const session = CS.requireRole('provider', 'login.html');
+    if (session) {
+      CS.initSidebar(); CS.setActiveNav('bookings');
+      const id = new URLSearchParams(location.search).get('id');
+      const b = CS.getBooking(id) || CS.getBookings().find(x => x.providerId === session.id) || CS.getBookings()[0];
+      if (!b) content.innerHTML = '<div class="empty-state"><p>Not found</p></div>';
+      else {
+        content.innerHTML = `
+          <div class="grid-2" style="align-items:start">
+            <div class="card">
+              <div class="flex-between mb-4"><h2 class="card-title" style="margin:0">${b.id}</h2>${CS.statusBadge(b.status)}</div>
+              <div class="info-grid mb-4">
+                <div><div class="info-label">Trader</div><div class="info-value">${b.traderName}</div></div>
+                <div><div class="info-label">Cargo</div><div class="info-value">${b.cargoName}</div></div>
+                <div><div class="info-label">CBM</div><div class="info-value">${b.cbm}</div></div>
+                <div><div class="info-label">Weight</div><div class="info-value">${b.weight} KG</div></div>
+                <div><div class="info-label">Route</div><div class="info-value text-sm">${CS.formatRoute(b.route)}</div></div>
+                <div><div class="info-label">Payment</div><div class="info-value">${CS.statusBadge(b.paymentStatus)}</div></div>
+                <div><div class="info-label">Pickup</div><div class="info-value text-sm">${b.pickup}<br/>${b.pickupDate}</div></div>
+                <div><div class="info-label">Delivery</div><div class="info-value text-sm">${b.delivery}<br/>${b.deliveryDate}</div></div>
+              </div>
+              <div class="flex gap-2" style="flex-wrap:wrap">
+                <button class="btn btn-success" id="accept">Accept</button>
+                <button class="btn btn-danger" id="reject">Reject</button>
+                <a class="btn btn-outline" href="chat.html">Chat with Trader</a>
+              </div>
+            </div>
+            <div class="card">
+              <h3 class="card-title mb-4">Timeline</h3>
+              <div class="timeline">${(b.timeline||[]).map(t=>`<div class="timeline-item ${t.done?'done':''} ${t.active?'active':''}"><div class="timeline-dot"></div><div class="timeline-title">${t.step}</div><div class="timeline-meta">${t.at||''}</div></div>`).join('')}</div>
+            </div>
+          </div>`;
+        document.getElementById('accept').onclick = () => { ProviderApp.acceptBooking(b.id); location.reload(); };
+        document.getElementById('reject').onclick = () => { ProviderApp.rejectBooking(b.id); location.reload(); };
+      }
+    }
+  </script>
+</body>
+</html>

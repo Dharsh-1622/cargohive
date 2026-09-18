@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CargoHive helps traders book shared cargo space and logistics providers fill unused truck capacity." />
+  <title>CargoHive — Book the Cargo Space You Actually Need</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { cs: { navy: '#0b1f3a', blue: '#1d4ed8', sky: '#0ea5e9' } },
+          fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+</head>
+<body class="public-page">
+  <div id="site-nav"></div>
+
+  <!-- HERO -->
+  <header class="ch-hero">
+    <div class="ch-hero-inner">
+      <div class="ch-brand-eyebrow">CargoHive</div>
+      <h1 class="ch-hero-title">Book the Cargo Space You Actually Need.</h1>
+      <p class="ch-hero-sub">CargoHive connects small exporters and traders with logistics providers who have unused truck or container capacity — so you reserve CBM that fits your shipment, not an entire vehicle.</p>
+      <div class="ch-hero-ctas">
+        <a href="trader/login.html" class="btn btn-primary btn-lg">Find Cargo Space</a>
+        <a href="provider/signup.html" class="btn btn-lg" style="background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.35)">List Your Available Space</a>
+        <a href="trader/login.html" class="btn btn-lg btn-nav-ghost" style="border-color:rgba(255,255,255,0.35)">Login</a>
+        <a href="trader/signup.html" class="btn btn-lg btn-nav-ghost" style="border-color:rgba(255,255,255,0.35)">Signup</a>
+      </div>
+      <div class="trust-strip">
+        <span class="trust-pill">✓ Verified Providers</span>
+        <span class="trust-pill">◆ Smart Space Matching</span>
+        <span class="trust-pill">₹ Transparent Pricing</span>
+        <span class="trust-pill">🔒 Secure Booking Flow</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- QUICK SEARCH -->
+  <div class="hero-search">
+    <form class="hero-search-card" id="hero-search-form">
+      <div class="hero-search-grid">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">From</label>
+          <input class="form-input" id="hs-from" placeholder="Erode" value="Erode" required />
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">To</label>
+          <input class="form-input" id="hs-to" placeholder="Chennai" value="Chennai" required />
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Pickup Date</label>
+          <input class="form-input" type="date" id="hs-date" value="2026-03-11" />
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Required Space (CBM)</label>
+          <input class="form-input" type="number" step="0.1" id="hs-cbm" value="2" min="0.1" />
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Cargo Weight (KG)</label>
+          <input class="form-input" type="number" id="hs-weight" value="350" placeholder="Optional" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="height:46px">Search Available Space</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- PROBLEM -->
+  <section class="section-wrap">
+    <div class="reveal">
+      <div class="section-eyebrow">The Challenge</div>
+      <h2 class="section-title-lg">Unused Space Shouldn't Become Unused Value.</h2>
+      <p class="section-lead">Trucks leave terminals with empty CBM every day, while small businesses struggle to find a ride that matches a partial load — not a full charter.</p>
+    </div>
+    <div class="ch-grid-4">
+      <div class="ch-card reveal">
+        <div class="ch-icon">📦</div>
+        <h3>Unused Capacity</h3>
+        <p>Many vehicles depart with free cubic metres that never get listed or sold.</p>
+      </div>
+      <div class="ch-card reveal">
+        <div class="ch-icon">🧵</div>
+        <h3>Small Shipment Needs</h3>
+        <p>Exporters often need only a slice of a truck — not the cost of an entire vehicle.</p>
+      </div>
+      <div class="ch-card reveal">
+        <div class="ch-icon">📞</div>
+        <h3>Fragmented Discovery</h3>
+        <p>Finding the right trip still depends on scattered calls, chats, and word of mouth.</p>
+      </div>
+      <div class="ch-card reveal">
+        <div class="ch-icon">❓</div>
+        <h3>Booking Uncertainty</h3>
+        <p>Without clear capacity, weight, and route checks, bookings feel risky for both sides.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section class="section-wrap" style="background:white;max-width:none;padding-left:0;padding-right:0">
+    <div style="max-width:1180px;margin:0 auto;padding:0 24px">
+      <div class="reveal">
+        <div class="section-eyebrow">The Platform</div>
+        <h2 class="section-title-lg">One Platform. From Available Space to Confirmed Shipment.</h2>
+        <p class="section-lead">CargoHive turns leftover capacity into bookable inventory — with checks before money moves.</p>
+      </div>
+      <div class="process-track reveal">
+        <div class="process-step"><div class="process-num">1</div><div class="font-semibold text-navy text-sm">Providers publish capacity</div></div>
+        <div class="process-step"><div class="process-num">2</div><div class="font-semibold text-navy text-sm">Traders search routes</div></div>
+        <div class="process-step"><div class="process-num">3</div><div class="font-semibold text-navy text-sm">Cargo details checked</div></div>
+        <div class="process-step"><div class="process-num">4</div><div class="font-semibold text-navy text-sm">CargoHive validates</div></div>
+        <div class="process-step"><div class="process-num">5</div><div class="font-semibold text-navy text-sm">Confirm &amp; pay</div></div>
+        <div class="process-step"><div class="process-num">6</div><div class="font-semibold text-navy text-sm">Provider manages shipment</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS PREVIEW -->
+  <section class="section-wrap">
+    <div class="reveal">
+      <div class="section-eyebrow">Workflows</div>
+      <h2 class="section-title-lg">How It Works</h2>
+      <p class="section-lead">Two clear journeys — one for traders booking space, one for providers filling capacity.</p>
+    </div>
+    <div class="ch-grid-2">
+      <div class="ch-card reveal">
+        <h3 style="font-size:1.2rem;margin-bottom:16px">For Traders</h3>
+        <ol style="margin:0;padding-left:18px;color:var(--cs-slate-600);line-height:1.9;font-size:0.925rem">
+          <li>Enter shipment requirements</li>
+          <li>Discover suitable cargo space</li>
+          <li>Review provider and route details</li>
+          <li>Enter cargo information</li>
+          <li>Pass smart validation</li>
+          <li>Confirm booking and payment</li>
+        </ol>
+      </div>
+      <div class="ch-card reveal">
+        <h3 style="font-size:1.2rem;margin-bottom:16px">For Providers</h3>
+        <ol style="margin:0;padding-left:18px;color:var(--cs-slate-600);line-height:1.9;font-size:0.925rem">
+          <li>Register your logistics business</li>
+          <li>Complete platform verification</li>
+          <li>Add vehicle and cargo capacity</li>
+          <li>Publish available space</li>
+          <li>Receive booking requests</li>
+          <li>Manage the shipment digitally</li>
+        </ol>
+      </div>
+    </div>
+    <div class="mt-6 reveal">
+      <a href="how-it-works.html" class="btn btn-primary">See How It Works</a>
+    </div>
+  </section>
+
+  <!-- INTELLIGENCE -->
+  <section class="section-wrap" style="background:#f1f5f9;max-width:none;padding-left:0;padding-right:0" id="intelligence">
+    <div style="max-width:1180px;margin:0 auto;padding:0 24px">
+      <div class="reveal">
+        <div class="section-eyebrow">Logistics Intelligence</div>
+        <h2 class="section-title-lg">Built With Logistics Intelligence</h2>
+        <p class="section-lead">CargoHive is more than a listing board — every booking runs through practical capacity, cargo, and schedule checks.</p>
+      </div>
+      <div class="intel-grid">
+        <div class="intel-card reveal"><div class="ch-icon">📐</div><h3>Smart Space Validation</h3><p>Checks whether requested CBM fits within remaining vehicle capacity.</p></div>
+        <div class="intel-card reveal"><div class="ch-icon">⚖️</div><h3>Weight Validation</h3><p>Compares cargo weight against available payload on the trip.</p></div>
+        <div class="intel-card reveal"><div class="ch-icon">🗺️</div><h3>Route Compatibility</h3><p>Confirms pickup and destination align with the planned route and stops.</p></div>
+        <div class="intel-card reveal"><div class="ch-icon">🧊</div><h3>Cargo Compatibility</h3><p>Reviews fragile, temperature, and hazardous needs against vehicle support.</p></div>
+        <div class="intel-card reveal"><div class="ch-icon">⏱️</div><h3>Schedule Validation</h3><p>Checks pickup and delivery timing against departure and ETA.</p></div>
+        <div class="intel-card reveal"><div class="ch-icon">🛡️</div><h3>Capacity Conflict Prevention</h3><p>Helps avoid overlapping reservations that exceed remaining space.</p></div>
+        <div class="intel-card reveal"><div class="ch-icon">🎯</div><h3>Smart Space Matching</h3><p>Surfaces trips that match route, CBM, and cargo constraints.</p></div>
+        <div class="intel-card reveal"><div class="ch-icon">📡</div><h3>Live Capacity Updates</h3><p>Available CBM updates as bookings are confirmed in the demo flow.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY CARGOHIVE -->
+  <section class="section-wrap">
+    <div class="reveal">
+      <div class="section-eyebrow">Benefits</div>
+      <h2 class="section-title-lg">Why CargoHive</h2>
+      <p class="section-lead">Practical advantages for both sides of a shared-capacity shipment.</p>
+    </div>
+    <div class="ch-grid-2">
+      <div class="ch-card reveal">
+        <h3 style="font-size:1.15rem;margin-bottom:14px">For Traders</h3>
+        <ul style="margin:0;padding-left:18px;color:var(--cs-slate-600);line-height:1.9;font-size:0.925rem">
+          <li>Book only the space your cargo needs</li>
+          <li>Discover more transport options on busy corridors</li>
+          <li>Compare available capacity and pricing</li>
+          <li>See transparent per-CBM pricing before you pay</li>
+          <li>Track booking status from confirmation onward</li>
+        </ul>
+      </div>
+      <div class="ch-card reveal">
+        <h3 style="font-size:1.15rem;margin-bottom:14px">For Providers</h3>
+        <ul style="margin:0;padding-left:18px;color:var(--cs-slate-600);line-height:1.9;font-size:0.925rem">
+          <li>Reduce unused cubic metres on scheduled trips</li>
+          <li>Reach traders looking for partial loads</li>
+          <li>Manage vehicles and capacity digitally</li>
+          <li>Receive structured booking requests</li>
+          <li>Improve capacity utilization trip after trip</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE CAPACITY VISUAL -->
+  <section class="section-wrap">
+    <div class="reveal">
+      <div class="section-eyebrow">Interactive Demo</div>
+      <h2 class="section-title-lg">See Shared Capacity in Action</h2>
+      <p class="section-lead">Watch how a partial booking changes available space on a live trip.</p>
+    </div>
+    <div class="capacity-demo reveal">
+      <div class="flex-between" style="flex-wrap:wrap;gap:12px;margin-bottom:8px">
+        <div>
+          <div style="font-size:1.25rem;font-weight:700">GV Transport</div>
+          <div style="opacity:0.75;margin-top:4px">Erode → Salem → Chennai · 10 CBM Truck</div>
+        </div>
+        <span class="badge badge-verified">Verified ✓</span>
+      </div>
+      <div class="cap-bar-demo">
+        <div class="cap-seg-occupied" id="cap-occ" style="width:50%"></div>
+        <div class="cap-seg-booked" id="cap-book" style="width:0%"></div>
+        <div class="cap-seg-free" id="cap-free" style="width:50%"></div>
+      </div>
+      <div class="flex gap-4 text-sm" style="opacity:0.85;flex-wrap:wrap;margin-bottom:20px">
+        <span>■ Occupied 5 CBM</span>
+        <span style="color:#34d399">■ Your booking</span>
+        <span style="color:#93c5fd">■ Still free</span>
+      </div>
+      <div class="ch-grid-2" style="gap:16px;margin-bottom:20px">
+        <div style="background:rgba(255,255,255,0.08);border-radius:14px;padding:16px">
+          <div class="text-xs" style="opacity:0.7">Vehicle snapshot</div>
+          <div style="margin-top:8px">Total <strong>10 CBM</strong> · Occupied <strong>5 CBM</strong> · Available <strong>5 CBM</strong></div>
+        </div>
+        <div style="background:rgba(255,255,255,0.08);border-radius:14px;padding:16px">
+          <div class="text-xs" style="opacity:0.7">Trader requirement</div>
+          <div style="margin-top:8px" id="cap-result"><strong>Available now:</strong> 5 CBM · Trader needs 2 CBM</div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" id="demo-book-btn">Simulate 2 CBM Booking</button>
+    </div>
+  </section>
+
+  <!-- ROLE BASED -->
+  <section class="section-wrap" style="background:white;max-width:none;padding-left:0;padding-right:0">
+    <div style="max-width:1180px;margin:0 auto;padding:0 24px">
+      <div class="reveal">
+        <div class="section-eyebrow">Who Uses CargoHive</div>
+        <h2 class="section-title-lg">A Role-Based Platform</h2>
+        <p class="section-lead">Three experiences — one shared capacity marketplace.</p>
+      </div>
+      <div class="ch-grid-3">
+        <div class="role-card-lg reveal">
+          <div class="ch-icon">📦</div>
+          <h3 style="font-size:1.15rem;font-weight:700;color:var(--cs-navy);margin:0 0 8px">Trader / Exporter</h3>
+          <p style="flex:1;color:var(--cs-slate-500);font-size:0.925rem;line-height:1.55;margin:0 0 20px">Find and book the space your shipment needs.</p>
+          <a href="trader/login.html" class="btn btn-primary btn-sm" style="align-self:flex-start">Explore Trader Flow</a>
+        </div>
+        <div class="role-card-lg reveal">
+          <div class="ch-icon">🚛</div>
+          <h3 style="font-size:1.15rem;font-weight:700;color:var(--cs-navy);margin:0 0 8px">Logistics Provider</h3>
+          <p style="flex:1;color:var(--cs-slate-500);font-size:0.925rem;line-height:1.55;margin:0 0 20px">Publish available capacity and manage incoming shipments.</p>
+          <a href="provider/login.html" class="btn btn-primary btn-sm" style="align-self:flex-start">Explore Provider Flow</a>
+        </div>
+        <div class="role-card-lg reveal">
+          <div class="ch-icon">🛡️</div>
+          <h3 style="font-size:1.15rem;font-weight:700;color:var(--cs-navy);margin:0 0 8px">Admin</h3>
+          <p style="flex:1;color:var(--cs-slate-500);font-size:0.925rem;line-height:1.55;margin:0 0 20px">Verify providers and monitor platform activity.</p>
+          <a href="admin/login.html" class="btn btn-primary btn-sm" style="align-self:flex-start">Admin Portal</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="section-wrap">
+    <div class="reveal">
+      <div class="section-eyebrow">Trust Layer</div>
+      <h2 class="section-title-lg">Built for Clearer, Safer Bookings</h2>
+      <p class="section-lead">Designed for an MVP demo with structured verification and booking visibility — not marketed as a full banking-grade stack.</p>
+    </div>
+    <div class="ch-grid-4">
+      <div class="ch-card reveal"><div class="ch-icon">✓</div><h3>Provider Verification</h3><p>Admin review before providers publish capacity as verified.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">🔐</div><h3>Secure Booking Flow</h3><p>Guided checkout with mock payment for demo presentations.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">📄</div><h3>Structured Shipment Info</h3><p>Cargo, CBM, weight, and route captured in one place.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">👁️</div><h3>Status Visibility</h3><p>See booking progress from confirmed to delivered.</p></div>
+      <div class="ch-card reveal" style="grid-column:span 2"><div class="ch-icon">📊</div><h3>Transparent Capacity</h3><p>Occupied vs available CBM is shown before you commit — so both sides see the same numbers.</p></div>
+    </div>
+  </section>
+
+  <!-- USE CASE -->
+  <section class="section-wrap" style="background:#eff6ff;max-width:none;padding-left:0;padding-right:0">
+    <div style="max-width:1180px;margin:0 auto;padding:0 24px">
+      <div class="usecase-panel reveal">
+        <div>
+          <div class="section-eyebrow">Real Scenario</div>
+          <h2 class="section-title-lg">From Tiruppur Fabric to Chennai Bay</h2>
+          <p style="color:var(--cs-slate-600);line-height:1.65;margin:0 0 16px">A small textile business in Tiruppur needs to move <strong>2 CBM</strong> of garments to Chennai. A logistics provider already running Tiruppur → Chennai has <strong>5 CBM</strong> free.</p>
+          <p style="color:var(--cs-slate-600);line-height:1.65;margin:0">CargoHive surfaces that trip. The trader enters cargo details. The system validates:</p>
+          <ul class="check-list">
+            <li><span>✓</span> Space</li>
+            <li><span>✓</span> Weight</li>
+            <li><span>✓</span> Route</li>
+            <li><span>✓</span> Schedule</li>
+          </ul>
+          <p style="color:var(--cs-slate-600);margin-top:16px;line-height:1.6">The trader books <strong>2 CBM</strong>. Remaining capacity becomes <strong>3 CBM</strong> for the next shipper.</p>
+        </div>
+        <div class="ch-card" style="background:white">
+          <div class="flex-between mb-3"><strong class="text-navy">SKM Logistics</strong><span class="badge badge-verified">Verified ✓</span></div>
+          <div class="route-line mb-4 text-sm">Tiruppur → Chennai</div>
+          <div class="capacity-bar mb-2" style="height:12px">
+            <div class="capacity-booked" style="width:50%"></div>
+            <div class="capacity-filled" style="width:20%;background:#34d399"></div>
+          </div>
+          <div class="text-xs text-muted mb-4">Occupied 5 · Booked 2 · Free 3 · ₹1,100 / CBM</div>
+          <div class="notice notice-success">Booking allowed · 2 CBM fits available capacity</div>
+          <a href="trader/login.html" class="btn btn-primary btn-block mt-4">Try This Flow</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section-wrap" id="features">
+    <div class="reveal">
+      <div class="section-eyebrow">Capabilities</div>
+      <h2 class="section-title-lg">Features</h2>
+      <p class="section-lead">Everything you need to discover, validate, and book shared cargo capacity.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="ch-card reveal"><div class="ch-icon">📦</div><h3>Shared Cargo Space</h3><p>List and book partial CBM instead of full vehicles.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">🎯</div><h3>Smart Matching</h3><p>Match trader needs with published trip capacity.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">🧮</div><h3>CBM Calculator</h3><p>Compute volume from length × width × height.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">📊</div><h3>Capacity Management</h3><p>Providers update available space as trips fill.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">🗺️</div><h3>Route Matching</h3><p>Align pickups and drop-offs with planned corridors.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">✓</div><h3>Cargo Validation</h3><p>Check fragile, temp, and hazardous constraints.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">📋</div><h3>Booking Management</h3><p>Track confirmed, in-transit, and delivered states.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">💳</div><h3>Payment Flow</h3><p>Mock UPI, card, and net-banking checkout for demos.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">🛡️</div><h3>Provider Verification</h3><p>Admin approval before capacity goes live as verified.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">🔔</div><h3>Notifications</h3><p>Stay updated on bookings, payments, and status changes.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">💬</div><h3>Chat</h3><p>Coordinate pickup details between trader and provider.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">📍</div><h3>Shipment Status</h3><p>Follow a clear timeline from booking to delivery.</p></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section-wrap">
+    <div class="cta-band reveal">
+      <h2>Have Space to Share or a Shipment to Move?</h2>
+      <p>CargoHive brings available logistics capacity and shipment requirements together in one digital workflow.</p>
+      <div class="flex gap-3" style="justify-content:center;flex-wrap:wrap">
+        <a href="trader/login.html" class="btn btn-lg" style="background:white;color:var(--cs-navy)">Find Cargo Space</a>
+        <a href="provider/signup.html" class="btn btn-lg" style="background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.35)">Join as Provider</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script src="js/common.js"></script>
+  <script src="js/site.js"></script>
+  <script>
+    CargoHiveSite.initPublicShell('home');
+    CargoHiveSite.initHeroSearch();
+    CargoHiveSite.initCapacityDemo();
+  </script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Cargo Space — CargoHive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { cs: { navy: '#0b1f3a', blue: '#1d4ed8', sky: '#0ea5e9' } },
+          fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <a href="../index.html" class="cs-logo cs-logo-white">
+          <span class="cs-logo-mark">CH</span>
+          <span>CargoHive</span>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="dashboard.html" data-nav="dashboard"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 5h7v7H4V5zm9 0h7v5h-7V5zM4 14h7v5H4v-5zm9 2h7v3h-7v-3z"/></svg> Dashboard</a>
+        <a class="nav-link" href="search-space.html" data-nav="search"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-width="2" d="M20 20l-3-3"/></svg> Search Space</a>
+        <a class="nav-link" href="bookings.html" data-nav="bookings"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7h8M8 11h8M8 15h5M6 3h12a2 2 0 012 2v14l-4-2-4 2-4-2-4 2V5a2 2 0 012-2z"/></svg> Bookings</a>
+        <a class="nav-link" href="chat.html" data-nav="chat"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 10h8M8 14h5M21 12a9 9 0 11-3.5-7.1L21 5v7z"/></svg> Chat</a>
+        <a class="nav-link" href="notifications.html" data-nav="notifications"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0"/></svg> Notifications</a>
+        <a class="nav-link" href="profile.html" data-nav="profile"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"/></svg> Profile</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="nav-link w-full" type="button" onclick="CS.logout('../index.html')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 12H4m0 0l3-3m-3 3l3 3m5-10h5a2 2 0 012 2v12a2 2 0 01-2 2h-5"/></svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Menu">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div>
+            <div class="font-semibold text-navy" id="topbar-name">Trader</div>
+            <div class="text-xs text-muted">Search shared capacity</div>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-body">
+        <h1 class="page-title">Search Cargo Space</h1>
+        <p class="page-sub">Find verified trucks with free CBM on your corridor — from Tiruppur textiles to Chennai port.</p>
+
+        <div class="card mb-6">
+          <form id="search-form">
+            <div class="grid-2" style="gap:14px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label" for="from">From</label>
+                <input class="form-input" id="from" placeholder="Erode, Tiruppur, Coimbatore…" />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label" for="to">To</label>
+                <input class="form-input" id="to" placeholder="Chennai, Bangalore…" />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label" for="pickupDate">Pickup Date</label>
+                <input class="form-input" type="date" id="pickupDate" />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label" for="cbm">Required CBM</label>
+                <input class="form-input" type="number" id="cbm" min="0.1" step="0.1" placeholder="e.g. 2" />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label" for="weight">Cargo Weight (KG)</label>
+                <input class="form-input" type="number" id="weight" min="1" placeholder="e.g. 350" />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label" for="maxPrice">Max Price / CBM (₹)</label>
+                <input class="form-input" type="number" id="maxPrice" min="0" placeholder="e.g. 1500" />
+              </div>
+            </div>
+            <div class="mt-4">
+              <div class="form-label">Filters</div>
+              <div class="filters-row" id="filter-chips">
+                <button type="button" class="filter-chip" data-filter="vehicleType" data-value="All">All Vehicles</button>
+                <button type="button" class="filter-chip" data-filter="vehicleType" data-value="10 CBM Truck">10 CBM Truck</button>
+                <button type="button" class="filter-chip" data-filter="vehicleType" data-value="Closed Container Truck">Closed Container</button>
+                <button type="button" class="filter-chip" data-filter="vehicleType" data-value="Mini Truck">Mini Truck</button>
+                <button type="button" class="filter-chip" data-filter="vehicleType" data-value="Lorry">Lorry</button>
+                <button type="button" class="filter-chip" data-filter="vehicleType" data-value="Pickup Van">Pickup Van</button>
+                <button type="button" class="filter-chip" data-filter="verifiedOnly" data-value="1">Verified</button>
+                <button type="button" class="filter-chip" data-filter="temp" data-value="1">Temp Controlled</button>
+                <button type="button" class="filter-chip" data-filter="fragile" data-value="1">Fragile OK</button>
+              </div>
+            </div>
+            <div class="flex gap-2 mt-4">
+              <button type="submit" class="btn btn-primary">Search Vehicles</button>
+              <button type="button" class="btn btn-secondary" id="reset-btn">Reset</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="flex-between mb-4">
+          <h2 class="card-title" id="results-title">Matching vehicles</h2>
+          <span class="text-sm text-muted" id="results-count"></span>
+        </div>
+        <div id="results" class="grid-2"></div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/trader.js"></script>
+  <script>
+    const session = CS.requireRole("trader", "login.html");
+    if (session) {
+      CS.initSidebar();
+      CS.setActiveNav("search");
+      document.getElementById("topbar-name").textContent = session.name || "Trader";
+
+      const filters = { vehicleType: "All", verifiedOnly: false, temp: false, fragile: false };
+
+      document.querySelectorAll("#filter-chips .filter-chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          const key = chip.dataset.filter;
+          const val = chip.dataset.value;
+          if (key === "vehicleType") {
+            document.querySelectorAll('[data-filter="vehicleType"]').forEach((c) => c.classList.remove("active"));
+            chip.classList.add("active");
+            filters.vehicleType = val;
+          } else {
+            chip.classList.toggle("active");
+            filters[key] = chip.classList.contains("active");
+          }
+          runSearch();
+        });
+      });
+      document.querySelector('[data-value="All"]').classList.add("active");
+
+      function runSearch() {
+        const results = TraderApp.searchVehicles({
+          from: document.getElementById("from").value.trim(),
+          to: document.getElementById("to").value.trim(),
+          cbm: document.getElementById("cbm").value,
+          weight: document.getElementById("weight").value,
+          maxPrice: document.getElementById("maxPrice").value,
+          vehicleType: filters.vehicleType,
+          verifiedOnly: filters.verifiedOnly,
+          temp: filters.temp,
+          fragile: filters.fragile,
+        });
+        const el = document.getElementById("results");
+        document.getElementById("results-count").textContent = results.length + " result" + (results.length === 1 ? "" : "s");
+        if (!results.length) {
+          el.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🚛</div><p>No vehicles match your filters. Try Erode → Chennai or clear filters.</p></div>';
+          return;
+        }
+        el.innerHTML = results.map((v) => TraderApp.vehicleCardHTML(v)).join("");
+      }
+
+      document.getElementById("search-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        runSearch();
+        CS.toast("Showing matching cargo space", "success");
+      });
+      document.getElementById("reset-btn").addEventListener("click", () => {
+        document.getElementById("search-form").reset();
+        filters.vehicleType = "All";
+        filters.verifiedOnly = false;
+        filters.temp = false;
+        filters.fragile = false;
+        document.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("active"));
+        document.querySelector('[data-value="All"]').classList.add("active");
+        runSearch();
+      });
+
+      runSearch();
+    }
+  </script>
+</body>
+</html>

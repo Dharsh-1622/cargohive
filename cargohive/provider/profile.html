@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provider Profile — CargoHive</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a></div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" data-nav="dashboard" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-nav="vehicles" href="vehicles.html"><span>🚛</span> My Vehicles</a>
+        <a class="nav-link" data-nav="add-vehicle" href="add-vehicle.html"><span>➕</span> Add Vehicle</a>
+        <a class="nav-link" data-nav="availability" href="availability.html"><span>📐</span> Availability</a>
+        <a class="nav-link" data-nav="bookings" href="bookings.html"><span>📋</span> Bookings</a>
+        <a class="nav-link" data-nav="chat" href="chat.html"><span>💬</span> Messages</a>
+        <a class="nav-link" data-nav="notifications" href="notifications.html"><span>🔔</span> Notifications</a>
+        <a class="nav-link" data-nav="profile" href="profile.html"><span>👤</span> Profile</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn btn-ghost btn-block" style="color:rgba(255,255,255,0.8);justify-content:flex-start" onclick="CS.logout('../index.html')">Logout</button></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle">☰</button>
+          <div class="page-title" style="font-size:1.25rem;margin:0">Company Profile</div></div>
+      </header>
+      <main class="page-body">
+        <div class="card" style="max-width:720px">
+          <div class="flex-between mb-4">
+            <h3 class="card-title" style="margin:0">Company details</h3>
+            <span id="status-badge"></span>
+          </div>
+          <form id="form">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Company Name</label><input class="form-input" id="companyName" /></div>
+              <div class="form-group"><label class="form-label">Contact Person</label><input class="form-input" id="contactPerson" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="email" /></div>
+              <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="phone" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Business Type</label><input class="form-input" id="businessType" /></div>
+              <div class="form-group"><label class="form-label">GST</label><input class="form-input" id="gst" /></div>
+            </div>
+            <div class="form-group"><label class="form-label">Business Address</label><input class="form-input" id="address" /></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">City</label><input class="form-input" id="city" /></div>
+              <div class="form-group"><label class="form-label">State</label><input class="form-input" id="state" /></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/provider.js"></script>
+  <script>
+    const session = CS.requireRole('provider', 'login.html');
+    if (session) {
+      CS.initSidebar(); CS.setActiveNav('profile');
+      const p = CS.getProviders().find(x => x.id === session.id);
+      if (p) {
+        document.getElementById('status-badge').innerHTML = CS.statusBadge(p.status);
+        companyName.value = p.companyName; contactPerson.value = p.contactPerson;
+        email.value = p.email; phone.value = p.phone; businessType.value = p.businessType;
+        gst.value = p.gst || ''; address.value = p.address; city.value = p.city; state.value = p.state;
+      }
+      document.getElementById('form').onsubmit = (e) => {
+        e.preventDefault();
+        ProviderApp.updateProfile({
+          companyName: companyName.value.trim(), contactPerson: contactPerson.value.trim(),
+          email: email.value.trim(), phone: phone.value.trim(), businessType: businessType.value.trim(),
+          gst: gst.value.trim(), address: address.value.trim(), city: city.value.trim(), state: state.value.trim(),
+        });
+      };
+    }
+  </script>
+</body>
+</html>

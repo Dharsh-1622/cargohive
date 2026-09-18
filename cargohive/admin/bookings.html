@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bookings — CargoHive Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { cs: { navy: '#0b1f3a', blue: '#1d4ed8', sky: '#0ea5e9' } },
+          fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar admin-sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <a href="dashboard.html" class="cs-logo cs-logo-white">
+          <span class="cs-logo-mark">CH</span>
+          <span>Admin</span>
+        </a>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-link" data-nav="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a href="provider-approvals.html" class="nav-link" data-nav="approvals">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Approvals
+        </a>
+        <a href="providers.html" class="nav-link" data-nav="providers">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Providers
+        </a>
+        <a href="traders.html" class="nav-link" data-nav="traders">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Traders
+        </a>
+        <a href="vehicles.html" class="nav-link" data-nav="vehicles">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          Vehicles
+        </a>
+        <a href="bookings.html" class="nav-link" data-nav="bookings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+          Bookings
+        </a>
+        <a href="reports.html" class="nav-link" data-nav="reports">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          Reports
+        </a>
+        <a href="settings.html" class="nav-link" data-nav="settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          Settings
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <button type="button" class="nav-link w-full" id="logout-btn" style="border:none;background:transparent;cursor:pointer;text-align:left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Open menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </button>
+          <div>
+            <div class="text-xs text-muted">Operations</div>
+            <div class="font-semibold text-navy">All Bookings</div>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-body">
+        <h1 class="page-title">Bookings</h1>
+        <p class="page-sub">Track every shared-space reservation across the platform.</p>
+
+        <div class="filters-row" id="booking-filters">
+          <button type="button" class="filter-chip active" data-filter="All">All</button>
+          <button type="button" class="filter-chip" data-filter="Confirmed">Confirmed</button>
+          <button type="button" class="filter-chip" data-filter="In Transit">In Transit</button>
+          <button type="button" class="filter-chip" data-filter="Delivered">Delivered</button>
+          <button type="button" class="filter-chip" data-filter="Cancelled">Cancelled</button>
+        </div>
+
+        <div class="card">
+          <div id="bookings-root"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/admin.js"></script>
+  <script>
+    (function () {
+      const session = CS.requireRole("admin", "login.html");
+      if (!session) return;
+      CS.initSidebar();
+      CS.setActiveNav("bookings");
+      document.getElementById("logout-btn").addEventListener("click", () => CS.logout("../index.html"));
+
+      const root = document.getElementById("bookings-root");
+      let filter = "All";
+
+      function render() {
+        AdminApp.renderBookings(root, filter);
+      }
+
+      document.getElementById("booking-filters").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-filter]");
+        if (!btn) return;
+        filter = btn.getAttribute("data-filter");
+        document.querySelectorAll("#booking-filters .filter-chip").forEach((c) => {
+          c.classList.toggle("active", c === btn);
+        });
+        render();
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trader Login — CargoHive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { cs: { navy: '#0b1f3a', blue: '#1d4ed8', sky: '#0ea5e9' } },
+          fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-visual">
+      <a href="../index.html" class="cs-logo cs-logo-white">
+        <span class="cs-logo-mark">CH</span>
+        <span>CargoHive</span>
+      </a>
+      <div>
+        <h2 style="font-size:2rem;font-weight:700;letter-spacing:-0.03em;margin:0 0 12px;line-height:1.2">Ship smarter across India.</h2>
+        <p style="opacity:0.8;line-height:1.6;max-width:360px;margin:0">Book only the CBM you need from verified logistics providers — Erode to Chennai, Tiruppur to Bangalore, and beyond.</p>
+        <div class="flex gap-2 mt-6" style="flex-wrap:wrap">
+          <span class="badge" style="background:rgba(255,255,255,0.15);color:white">Verified Providers</span>
+          <span class="badge" style="background:rgba(255,255,255,0.15);color:white">Pay per CBM</span>
+          <span class="badge" style="background:rgba(255,255,255,0.15);color:white">Live Tracking</span>
+        </div>
+      </div>
+      <div class="text-sm" style="opacity:0.6">HackWave 2026 Demo · Demo: trader@cargohive.example</div>
+    </div>
+
+    <div class="auth-form-wrap">
+      <div class="auth-card">
+        <h1 class="auth-title">Welcome back</h1>
+        <p class="auth-sub">Sign in to your trader account to find shared cargo space.</p>
+
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-input" type="email" id="email" name="email" required placeholder="trader@cargohive.example" value="trader@cargohive.example" />
+            <div class="form-error">Email is required</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-input" type="password" id="password" name="password" required placeholder="••••••••" value="trader123" />
+            <div class="form-error">Password is required</div>
+          </div>
+          <div class="flex-between" style="margin-bottom:20px">
+            <label class="form-check" style="margin:0">
+              <input type="checkbox" id="remember" checked />
+              <span>Remember me</span>
+            </label>
+            <a href="#" id="forgot-link" class="text-sm" style="color:var(--cs-blue);font-weight:600">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg">Login as Trader</button>
+        </form>
+
+        <p class="text-sm text-muted mt-4" style="text-align:center">
+          New here?
+          <a href="signup.html" style="color:var(--cs-blue);font-weight:600">Create Trader Account</a>
+        </p>
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--cs-slate-200);text-align:center">
+          <a href="../provider/login.html" class="btn btn-secondary btn-sm">Continue as Logistics Provider →</a>
+        </div>
+        <div class="notice notice-info mt-4">
+          Demo credentials: <strong>trader@cargohive.example</strong> / <strong>trader123</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/trader.js"></script>
+  <script>
+    document.getElementById("forgot-link").addEventListener("click", function (e) {
+      e.preventDefault();
+      CS.toast("Password reset link sent to your email (demo).", "info");
+    });
+    document.getElementById("login-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!CS.validateRequired(this)) {
+        CS.toast("Please fill in all required fields", "error");
+        return;
+      }
+      TraderApp.login(
+        document.getElementById("email").value.trim(),
+        document.getElementById("password").value,
+        document.getElementById("remember").checked
+      );
+    });
+  </script>
+</body>
+</html>

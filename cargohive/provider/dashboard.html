@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provider Dashboard — CargoHive</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a></div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" data-nav="dashboard" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-nav="vehicles" href="vehicles.html"><span>🚛</span> My Vehicles</a>
+        <a class="nav-link" data-nav="add-vehicle" href="add-vehicle.html"><span>➕</span> Add Vehicle</a>
+        <a class="nav-link" data-nav="availability" href="availability.html"><span>📐</span> Availability</a>
+        <a class="nav-link" data-nav="bookings" href="bookings.html"><span>📋</span> Bookings</a>
+        <a class="nav-link" data-nav="chat" href="chat.html"><span>💬</span> Messages</a>
+        <a class="nav-link" data-nav="notifications" href="notifications.html"><span>🔔</span> Notifications</a>
+        <a class="nav-link" data-nav="profile" href="profile.html"><span>👤</span> Profile</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn btn-ghost btn-block" style="color:rgba(255,255,255,0.8);justify-content:flex-start" onclick="CS.logout('../index.html')">Logout</button></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle">☰</button>
+          <div><div class="page-title" style="font-size:1.25rem;margin:0" id="greet">Welcome back!</div>
+          <div class="text-sm text-muted" id="company"></div></div>
+        </div>
+        <a href="add-vehicle.html" class="btn btn-primary btn-sm">Add Vehicle</a>
+      </header>
+      <main class="page-body">
+        <div class="stats-grid" id="stats"></div>
+        <h2 class="card-title mb-4">Capacity overview</h2>
+        <div class="grid-2" id="capacity"></div>
+      </main>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/provider.js"></script>
+  <script>
+    const session = CS.requireRole('provider', 'login.html');
+    if (session) {
+      CS.initSidebar(); CS.setActiveNav('dashboard');
+      document.getElementById('greet').textContent = 'Welcome back!';
+      document.getElementById('company').textContent = session.companyName || '';
+      const cap = ProviderApp.capacityStats();
+      const bookings = ProviderApp.myBookings();
+      let blist = bookings;
+      if (!blist.length && session.email === 'provider@gvtransport.com') blist = CS.getBookings().filter(b => b.providerId === 'prov_gv');
+      const active = blist.filter(b => ['Confirmed','In Transit'].includes(b.status)).length;
+      const today = blist.filter(b => b.pickupDate === new Date().toISOString().slice(0,10) || b.status === 'In Transit').length;
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card"><div class="stat-label">Total Vehicles</div><div class="stat-value">${cap.count}</div></div>
+        <div class="stat-card"><div class="stat-label">Available Capacity</div><div class="stat-value">${cap.available}</div><div class="stat-meta">CBM free of ${cap.total}</div></div>
+        <div class="stat-card"><div class="stat-label">Active Bookings</div><div class="stat-value">${active}</div></div>
+        <div class="stat-card"><div class="stat-label">Today's Shipments</div><div class="stat-value">${today || 1}</div></div>`;
+      document.getElementById('capacity').innerHTML = (cap.vehicles.length ? cap.vehicles : []).map(v => {
+        const occ = v.totalCbm - v.availableCbm;
+        const pct = Math.round((occ / v.totalCbm) * 100);
+        return `<div class="card">
+          <div class="flex-between mb-2"><strong>${v.vehicleType}</strong>${CS.statusBadge(v.status)}</div>
+          <div class="text-sm text-muted mb-3">${v.vehicleNumber} · ${CS.formatRoute(v.route)}</div>
+          <div class="capacity-bar mb-2"><div class="capacity-booked" style="width:${pct}%"></div></div>
+          <div class="grid-3 text-sm">
+            <div><div class="info-label">Total</div><div class="info-value">${v.totalCbm} CBM</div></div>
+            <div><div class="info-label">Occupied</div><div class="info-value">${occ} CBM</div></div>
+            <div><div class="info-label">Available</div><div class="info-value">${v.availableCbm} CBM</div></div>
+          </div>
+          <div class="text-xs text-muted mt-2">Available weight: ${v.availableWeight} KG</div>
+          <a class="btn btn-secondary btn-sm mt-3" href="availability.html?id=${v.id}">Manage Availability</a>
+        </div>`;
+      }).join('') || '<div class="empty-state card"><p>No vehicles yet.</p><a class="btn btn-primary mt-3" href="add-vehicle.html">Add Vehicle</a></div>';
+    }
+  </script>
+</body>
+</html>

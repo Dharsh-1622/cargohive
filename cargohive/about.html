@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Learn why CargoHive was built to connect partial cargo needs with unused logistics capacity." />
+  <title>About CargoHive</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+</head>
+<body class="public-page">
+  <div id="site-nav"></div>
+
+  <header class="page-hero">
+    <h1>About CargoHive</h1>
+    <p>We built CargoHive so small businesses can access the cubic metres they need — and providers can put leftover capacity to work.</p>
+  </header>
+
+  <section class="section-wrap">
+    <div class="reveal">
+      <div class="section-eyebrow">Why We Exist</div>
+      <h2 class="section-title-lg">Capacity Is Valuable. Empty Space Shouldn't Travel Alone.</h2>
+      <p class="section-lead" style="max-width:720px">Regional freight corridors move constantly, yet a surprising amount of cubic capacity rides unused. At the same time, exporters and traders with smaller consignments struggle to find a trip that fits a partial load without overpaying for a full vehicle.</p>
+      <p style="color:var(--cs-slate-600);line-height:1.7;max-width:720px;margin:0 0 16px">CargoHive was created to close that gap — making available space discoverable, bookable, and validated before anyone commits.</p>
+    </div>
+  </section>
+
+  <section class="section-wrap" style="background:white;max-width:none;padding-left:0;padding-right:0">
+    <div style="max-width:1180px;margin:0 auto;padding:0 24px" class="ch-grid-2">
+      <div class="ch-card reveal">
+        <div class="section-eyebrow">Vision</div>
+        <h3 style="font-size:1.35rem;color:var(--cs-navy);margin:0 0 12px;font-weight:800">Make transportation capacity easier to discover and use.</h3>
+        <p style="color:var(--cs-slate-500);line-height:1.6;margin:0">We imagine a market where leftover CBM is as visible as a seat on a bus — searchable by route, date, and cargo needs.</p>
+      </div>
+      <div class="ch-card reveal">
+        <div class="section-eyebrow">Mission</div>
+        <h3 style="font-size:1.35rem;color:var(--cs-navy);margin:0 0 12px;font-weight:800">Help small businesses move cargo smarter.</h3>
+        <p style="color:var(--cs-slate-500);line-height:1.6;margin:0">Give traders access to suitable logistics capacity while helping providers improve utilisation on trips they already run.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-wrap">
+    <div class="reveal">
+      <div class="section-eyebrow">Our Approach</div>
+      <h2 class="section-title-lg">Platform Ecosystem</h2>
+      <p class="section-lead">Three roles, one shared capacity workflow.</p>
+    </div>
+    <div class="ch-grid-3">
+      <div class="ch-card reveal"><div class="ch-icon">📦</div><h3>Trader</h3><p>Search routes, enter cargo details, validate fit, book CBM, and follow shipment status.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">🚛</div><h3>Provider</h3><p>Publish vehicles and free capacity, accept bookings, and manage trip utilisation.</p></div>
+      <div class="ch-card reveal"><div class="ch-icon">🛡️</div><h3>Admin</h3><p>Verify logistics partners and oversee users, vehicles, and bookings across the platform.</p></div>
+    </div>
+  </section>
+
+  <section class="section-wrap" style="background:#f1f5f9;max-width:none;padding-left:0;padding-right:0">
+    <div style="max-width:1180px;margin:0 auto;padding:0 24px">
+      <div class="reveal">
+        <div class="section-eyebrow">Differentiation</div>
+        <h2 class="section-title-lg">What Makes CargoHive Different</h2>
+      </div>
+      <div class="ch-grid-4" style="margin-top:32px">
+        <div class="ch-card reveal"><h3>Shared capacity discovery</h3><p>See leftover CBM on real planned trips — not only full-vehicle quotes.</p></div>
+        <div class="ch-card reveal"><h3>Smart booking validation</h3><p>Space, weight, route, cargo, and schedule checks before confirmation.</p></div>
+        <div class="ch-card reveal"><h3>Capacity visibility</h3><p>Occupied vs available capacity is clear to both trader and provider.</p></div>
+        <div class="ch-card reveal"><h3>Route-aware matching</h3><p>Align shipments with corridors providers already travel.</p></div>
+        <div class="ch-card reveal" style="grid-column:span 2"><h3>Digital booking workflow</h3><p>From search and validation to mock payment and status tracking — one connected flow designed for demo and future expansion.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-wrap">
+    <div class="cta-band reveal">
+      <h2>Ready to explore CargoHive?</h2>
+      <p>Start as a trader searching for space, or register as a provider to list capacity.</p>
+      <div class="flex gap-3" style="justify-content:center;flex-wrap:wrap">
+        <a href="trader/login.html" class="btn btn-lg" style="background:white;color:var(--cs-navy)">Find Cargo Space</a>
+        <a href="provider/signup.html" class="btn btn-lg" style="background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.35)">Join as Provider</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="site-footer"></div>
+  <script src="js/common.js"></script>
+  <script src="js/site.js"></script>
+  <script>CargoHiveSite.initPublicShell('about');</script>
+</body>
+</html>

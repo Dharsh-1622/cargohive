@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Availability — CargoHive</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><a href="../index.html" class="cs-logo cs-logo-white"><span class="cs-logo-mark">CH</span><span>CargoHive</span></a></div>
+      <nav class="sidebar-nav">
+        <a class="nav-link" data-nav="dashboard" href="dashboard.html"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-nav="vehicles" href="vehicles.html"><span>🚛</span> My Vehicles</a>
+        <a class="nav-link" data-nav="add-vehicle" href="add-vehicle.html"><span>➕</span> Add Vehicle</a>
+        <a class="nav-link" data-nav="availability" href="availability.html"><span>📐</span> Availability</a>
+        <a class="nav-link" data-nav="bookings" href="bookings.html"><span>📋</span> Bookings</a>
+        <a class="nav-link" data-nav="chat" href="chat.html"><span>💬</span> Messages</a>
+        <a class="nav-link" data-nav="notifications" href="notifications.html"><span>🔔</span> Notifications</a>
+        <a class="nav-link" data-nav="profile" href="profile.html"><span>👤</span> Profile</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn btn-ghost btn-block" style="color:rgba(255,255,255,0.8);justify-content:flex-start" onclick="CS.logout('../index.html')">Logout</button></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle">☰</button>
+          <div class="page-title" style="font-size:1.25rem;margin:0">Capacity Management</div></div>
+      </header>
+      <main class="page-body">
+        <div class="card mb-4">
+          <label class="form-label">Select Vehicle</label>
+          <select class="form-select" id="vehicle-select"></select>
+        </div>
+        <div class="card" id="panel"></div>
+      </main>
+    </div>
+  </div>
+  <script src="../js/common.js"></script>
+  <script src="../js/provider.js"></script>
+  <script>
+    const session = CS.requireRole('provider', 'login.html');
+    if (session) {
+      CS.initSidebar(); CS.setActiveNav('availability');
+      let vehicles = ProviderApp.myVehicles();
+      if (!vehicles.length && session.email === 'provider@gvtransport.com') vehicles = CS.getVehicles().filter(v => v.providerId === 'prov_gv');
+      const sel = document.getElementById('vehicle-select');
+      const qid = new URLSearchParams(location.search).get('id');
+      sel.innerHTML = vehicles.map(v => `<option value="${v.id}" ${v.id===qid?'selected':''}>${v.vehicleNumber} · ${v.vehicleType}</option>`).join('');
+      function render() {
+        const v = CS.getVehicle(sel.value);
+        if (!v) { panel.innerHTML = '<div class="empty-state"><p>No vehicles</p></div>'; return; }
+        const booked = v.totalCbm - v.availableCbm;
+        const pct = Math.round((booked / v.totalCbm) * 100);
+        panel.innerHTML = `
+          <div class="flex-between mb-3"><div><h3 class="card-title" style="margin:0">${v.vehicleNumber}</h3>
+          <div class="text-sm text-muted mt-1">${CS.formatRoute(v.route)}</div></div>${CS.statusBadge(v.status)}</div>
+          <div class="capacity-bar mb-3" style="height:14px"><div class="capacity-booked" style="width:${pct}%"></div></div>
+          <div class="grid-3 mb-4">
+            <div><div class="info-label">Total</div><div class="info-value">${v.totalCbm} CBM</div></div>
+            <div><div class="info-label">Booked</div><div class="info-value">${booked} CBM</div></div>
+            <div><div class="info-label">Available</div><div class="info-value">${v.availableCbm} CBM</div></div>
+          </div>
+          <div class="notice notice-info mb-4">Available Weight: <strong>${v.availableWeight} KG</strong></div>
+          <div id="warn" class="notice notice-warning mb-4 hidden"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Update Available CBM</label><input class="form-input" type="number" step="0.1" id="availCbm" value="${v.availableCbm}" /></div>
+            <div class="form-group"><label class="form-label">Update Available Weight</label><input class="form-input" type="number" id="availWeight" value="${v.availableWeight}" /></div>
+          </div>
+          <button class="btn btn-primary" id="save">Update Availability</button>`;
+        document.getElementById('availCbm').addEventListener('input', () => {
+          const n = Number(availCbm.value);
+          const warn = document.getElementById('warn');
+          if (n < booked && booked > 0) {
+            warn.classList.remove('hidden');
+            warn.innerHTML = 'Reducing capacity may affect existing bookings (' + booked + ' CBM currently booked).';
+          } else warn.classList.add('hidden');
+        });
+        document.getElementById('save').onclick = () => {
+          const res = ProviderApp.updateAvailability(v.id, availCbm.value, availWeight.value);
+          if (res.ok) {
+            if (res.warning) CS.toast(res.warning, 'warning');
+            render();
+          }
+        };
+      }
+      sel.onchange = render;
+      render();
+    }
+  </script>
+</body>
+</html>
