@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard — CargoHive Trader</title>
+  <title>Trader Dashboard — CargoHive Marketplace</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
@@ -12,7 +12,14 @@
     tailwind.config = {
       theme: {
         extend: {
-          colors: { cs: { navy: '#0b1f3a', blue: '#1d4ed8', sky: '#0ea5e9' } },
+          colors: {
+            cs: {
+              navy: '#0b1f3a',
+              blue: '#1d4ed8',
+              sky: '#0ea5e9',
+              slate: '#0f172a'
+            }
+          },
           fontFamily: { sans: ['DM Sans', 'system-ui', 'sans-serif'] }
         }
       }
@@ -22,6 +29,7 @@
 </head>
 <body>
   <div class="app-shell">
+    <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
         <a href="../index.html" class="cs-logo cs-logo-white">
@@ -30,96 +38,665 @@
         </a>
       </div>
       <nav class="sidebar-nav">
-        <a class="nav-link" href="dashboard.html" data-nav="dashboard"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 5h7v7H4V5zm9 0h7v5h-7V5zM4 14h7v5H4v-5zm9 2h7v3h-7v-3z"/></svg> Dashboard</a>
-        <a class="nav-link" href="search-space.html" data-nav="search"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-width="2" d="M20 20l-3-3"/></svg> Search Space</a>
-        <a class="nav-link" href="bookings.html" data-nav="bookings"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7h8M8 11h8M8 15h5M6 3h12a2 2 0 012 2v14l-4-2-4 2-4-2-4 2V5a2 2 0 012-2z"/></svg> Bookings</a>
-        <a class="nav-link" href="chat.html" data-nav="chat"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 10h8M8 14h5M21 12a9 9 0 11-3.5-7.1L21 5v7z"/></svg> Chat</a>
-        <a class="nav-link" href="notifications.html" data-nav="notifications"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0"/></svg> Notifications</a>
-        <a class="nav-link" href="profile.html" data-nav="profile"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"/></svg> Profile</a>
+        <a class="nav-link" href="dashboard.html" data-nav="dashboard">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 5h7v7H4V5zm9 0h7v5h-7V5zM4 14h7v5H4v-5zm9 2h7v3h-7v-3z"/></svg>
+          Dashboard
+        </a>
+        <a class="nav-link" href="search-space.html" data-nav="search">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-width="2" d="M20 20l-3-3"/></svg>
+          Find Cargo Space
+        </a>
+        <a class="nav-link" href="bookings.html" data-nav="bookings">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 7h8M8 11h8M8 15h5M6 3h12a2 2 0 012 2v14l-4-2-4 2-4-2-4 2V5a2 2 0 012-2z"/></svg>
+          My Bookings
+        </a>
+        <a class="nav-link" href="chat.html" data-nav="chat">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M8 10h8M8 14h5M21 12a9 9 0 11-3.5-7.1L21 5v7z"/></svg>
+          Messages
+        </a>
+        <a class="nav-link" href="notifications.html" data-nav="notifications">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0"/></svg>
+          Notifications
+        </a>
+        <a class="nav-link" href="profile.html" data-nav="profile">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"/></svg>
+          Profile
+        </a>
       </nav>
       <div class="sidebar-footer">
-        <button class="nav-link w-full" type="button" onclick="CS.logout('../index.html')">
+        <button class="nav-link w-full text-left" type="button" onclick="CS.logout('../index.html')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 12H4m0 0l3-3m-3 3l3 3m5-10h5a2 2 0 012 2v12a2 2 0 01-2 2h-5"/></svg>
           Logout
         </button>
       </div>
     </aside>
 
+    <!-- Main Content Area -->
     <div class="main-content">
+      <!-- Topbar Header -->
       <header class="topbar">
         <div class="topbar-left">
-          <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Menu">
+          <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Toggle navigation menu">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
           <div>
-            <div class="font-semibold text-navy" id="topbar-name">Trader</div>
-            <div class="text-xs text-muted">Trader Portal</div>
+            <div class="font-semibold text-navy flex items-center gap-2">
+              <span id="topbar-name">Trader</span>
+              <span class="badge badge-verified text-[11px] py-0.5">Verified Trader</span>
+            </div>
+            <div class="text-xs text-muted">Trader Marketplace Portal</div>
           </div>
         </div>
-        <a href="search-space.html" class="btn btn-primary btn-sm">Find Cargo Space</a>
+        <div class="flex items-center gap-2.5">
+          <a href="search-space.html" class="btn btn-primary btn-sm hidden sm:inline-flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-width="2" d="M20 20l-3-3"/></svg>
+            Find Cargo Space
+          </a>
+        </div>
       </header>
 
       <main class="page-body">
-        <h1 class="page-title" id="greeting">Good morning</h1>
-        <p class="page-sub">Here's an overview of your shared cargo bookings and available space today.</p>
+        <!-- 1. DASHBOARD HEADER & WELCOME SECTION -->
+        <section class="mb-6">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-navy/95 via-navy/90 to-blue-900 text-white shadow-sm relative overflow-hidden" style="background: linear-gradient(135deg, #0b1f3a 0%, #13335e 60%, #1d4ed8 100%);">
+            <div class="relative z-10 max-w-2xl">
+              <div class="flex items-center gap-2.5 mb-2">
+                <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-500/20 text-blue-200 border border-blue-400/30">
+                  Logistics Marketplace
+                </span>
+                <span class="text-xs text-blue-200 font-medium" id="current-date">Sunday, 20 September 2026</span>
+              </div>
+              <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2" id="greeting-headline">
+                Good morning, Trader 👋
+              </h1>
+              <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+                Find the right cargo space for your next shipment. Small exporters can discover and book only the cargo/container space they actually need.
+              </p>
+              <div class="flex items-center gap-2 mt-3 text-xs text-blue-200">
+                <span>Company: <strong class="text-white" id="trader-company-name">DK Exports</strong></span>
+                <span>•</span>
+                <span class="text-emerald-300 font-medium">Shared-Space Active</span>
+              </div>
+            </div>
+            <div class="relative z-10 flex flex-wrap gap-2.5 lg:self-center">
+              <button type="button" class="btn btn-secondary btn-sm bg-white text-navy font-semibold hover:bg-slate-50" onclick="CS.openModal('cbm-calc-modal')">
+                📐 Calculate CBM
+              </button>
+              <a href="search-space.html" class="btn btn-primary btn-sm bg-blue-600 hover:bg-blue-500 text-white font-semibold">
+                🔍 Find Shared Space
+              </a>
+            </div>
+          </div>
+        </section>
 
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">Active Bookings</div>
-            <div class="stat-value" id="stat-active">0</div>
-            <div class="stat-meta">Confirmed &amp; in transit</div>
+        <!-- 2. DASHBOARD STATISTICS (4 CARDS) -->
+        <section class="mb-6">
+          <div class="stats-grid">
+            <!-- Active Shipments -->
+            <div class="stat-card border-l-4 border-l-blue-600">
+              <div class="flex items-center justify-between mb-2">
+                <div class="stat-label">Active Shipments</div>
+                <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">
+                  🚚
+                </div>
+              </div>
+              <div class="stat-value text-blue-700 flex items-baseline gap-2">
+                <span id="stat-active">2</span>
+                <span class="pulse-indicator" title="Live tracking"></span>
+              </div>
+              <div class="stat-meta">Currently in transit</div>
+              <div class="text-[11px] text-emerald-600 font-medium mt-1">✓ 1 delivery expected tomorrow</div>
+            </div>
+
+            <!-- Pending Bookings -->
+            <div class="stat-card border-l-4 border-l-amber-500">
+              <div class="flex items-center justify-between mb-2">
+                <div class="stat-label">Pending Bookings</div>
+                <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">
+                  ⏳
+                </div>
+              </div>
+              <div class="stat-value text-amber-600" id="stat-pending">1</div>
+              <div class="stat-meta">Awaiting provider confirmation</div>
+              <div class="text-[11px] text-slate-500 mt-1">Submitted 3 hrs ago</div>
+            </div>
+
+            <!-- Completed Shipments -->
+            <div class="stat-card border-l-4 border-l-emerald-600">
+              <div class="flex items-center justify-between mb-2">
+                <div class="stat-label">Completed Shipments</div>
+                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
+                  📦
+                </div>
+              </div>
+              <div class="stat-value text-emerald-700" id="stat-completed">8</div>
+              <div class="stat-meta">Successfully delivered</div>
+              <div class="text-[11px] text-emerald-600 font-medium mt-1">✓ 100% on-time completion</div>
+            </div>
+
+            <!-- Total Space Booked -->
+            <div class="stat-card border-l-4 border-l-indigo-600">
+              <div class="flex items-center justify-between mb-2">
+                <div class="stat-label">Total Space Booked</div>
+                <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                  📐
+                </div>
+              </div>
+              <div class="stat-value text-indigo-700" id="stat-space">24 CBM</div>
+              <div class="stat-meta">Across recent shipments</div>
+              <div class="text-[11px] text-blue-600 font-medium mt-1">Saved ~₹18,400 via shared space</div>
+            </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Upcoming</div>
-            <div class="stat-value" id="stat-upcoming">0</div>
-            <div class="stat-meta">Pickup scheduled</div>
+        </section>
+
+        <!-- 3. QUICK ACTIONS -->
+        <section class="mb-8">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-base font-bold text-navy flex items-center gap-2">
+              <span>⚡</span> Quick Actions
+            </h2>
+            <span class="text-xs text-muted">Direct portal shortcuts</span>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Completed</div>
-            <div class="stat-value" id="stat-completed">0</div>
-            <div class="stat-meta">Delivered safely</div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <!-- A. Find Cargo Space -->
+            <a href="search-space.html" class="quick-action-card flex-col items-start p-3.5">
+              <div class="quick-action-icon bg-blue-100 text-blue-700 mb-1">
+                🔍
+              </div>
+              <div class="font-bold text-navy text-xs mt-1">Find Space</div>
+              <div class="text-[11px] text-muted leading-tight mt-0.5">Search vehicle capacity</div>
+            </a>
+
+            <!-- B. My Bookings -->
+            <a href="bookings.html" class="quick-action-card flex-col items-start p-3.5">
+              <div class="quick-action-icon bg-indigo-100 text-indigo-700 mb-1">
+                📋
+              </div>
+              <div class="font-bold text-navy text-xs mt-1">My Bookings</div>
+              <div class="text-[11px] text-muted leading-tight mt-0.5">Manage shipments</div>
+            </a>
+
+            <!-- C. Track Shipment -->
+            <a href="booking-details.html?id=CH-1001" class="quick-action-card flex-col items-start p-3.5">
+              <div class="quick-action-icon bg-emerald-100 text-emerald-700 mb-1">
+                🚚
+              </div>
+              <div class="font-bold text-navy text-xs mt-1">Track Active</div>
+              <div class="text-[11px] text-muted leading-tight mt-0.5">Live transit status</div>
+            </a>
+
+            <!-- D. Messages -->
+            <a href="chat.html" class="quick-action-card flex-col items-start p-3.5">
+              <div class="quick-action-icon bg-sky-100 text-sky-700 mb-1">
+                💬
+              </div>
+              <div class="font-bold text-navy text-xs mt-1">Messages</div>
+              <div class="text-[11px] text-muted leading-tight mt-0.5">Chat with carriers</div>
+            </a>
+
+            <!-- E. Notifications -->
+            <a href="notifications.html" class="quick-action-card flex-col items-start p-3.5">
+              <div class="quick-action-icon bg-amber-100 text-amber-700 mb-1">
+                🔔
+              </div>
+              <div class="font-bold text-navy text-xs mt-1">Notifications</div>
+              <div class="text-[11px] text-muted leading-tight mt-0.5">Booking updates</div>
+            </a>
+
+            <!-- F. Profile -->
+            <a href="profile.html" class="quick-action-card flex-col items-start p-3.5">
+              <div class="quick-action-icon bg-slate-100 text-slate-700 mb-1">
+                👤
+              </div>
+              <div class="font-bold text-navy text-xs mt-1">Profile</div>
+              <div class="text-[11px] text-muted leading-tight mt-0.5">Trader settings</div>
+            </a>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Saved Routes</div>
-            <div class="stat-value" id="stat-routes">0</div>
-            <div class="stat-meta">Unique corridors used</div>
+        </section>
+
+        <!-- 4. FIND CARGO SPACE SEARCH WIDGET -->
+        <section class="mb-8">
+          <div class="card p-5 sm:p-6 bg-white border border-blue-200/80 shadow-md">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-100">
+              <div>
+                <h2 class="card-title text-lg text-navy flex items-center gap-2">
+                  <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold">🔍</span>
+                  Find Available Cargo Space
+                </h2>
+                <p class="text-xs text-muted mt-0.5">Search partial container &amp; truck space on active Tamil Nadu corridors. Pay only for the volume you need.</p>
+              </div>
+              <button type="button" class="text-xs font-semibold text-blue-700 hover:text-blue-800 flex items-center gap-1 self-start sm:self-auto" onclick="CS.openModal('cbm-calc-modal')">
+                <span>📐 Need help calculating CBM?</span>
+              </button>
+            </div>
+
+            <form id="dashboard-search-form">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5">
+                <!-- From -->
+                <div class="form-group mb-0">
+                  <label class="form-label text-xs" for="dash-search-from">From *</label>
+                  <input class="form-input text-sm" id="dash-search-from" list="origin-cities" placeholder="e.g. Tiruppur" value="Tiruppur" required />
+                  <datalist id="origin-cities">
+                    <option value="Tiruppur"></option>
+                    <option value="Erode"></option>
+                    <option value="Coimbatore"></option>
+                    <option value="Salem"></option>
+                    <option value="Karur"></option>
+                  </datalist>
+                </div>
+
+                <!-- To -->
+                <div class="form-group mb-0">
+                  <label class="form-label text-xs" for="dash-search-to">To *</label>
+                  <input class="form-input text-sm" id="dash-search-to" list="dest-cities" placeholder="e.g. Chennai" value="Chennai" required />
+                  <datalist id="dest-cities">
+                    <option value="Chennai"></option>
+                    <option value="Bangalore"></option>
+                    <option value="Tuticorin"></option>
+                    <option value="Kochi"></option>
+                  </datalist>
+                </div>
+
+                <!-- Pickup Date -->
+                <div class="form-group mb-0">
+                  <label class="form-label text-xs" for="dash-search-date">Pickup Date</label>
+                  <input class="form-input text-sm" type="date" id="dash-search-date" />
+                </div>
+
+                <!-- Required Space (CBM) -->
+                <div class="form-group mb-0">
+                  <div class="flex items-center justify-between">
+                    <label class="form-label text-xs" for="dash-search-cbm">Space (CBM) *</label>
+                    <button type="button" class="text-[10px] text-blue-600 hover:underline" onclick="CS.openModal('cbm-calc-modal')">Calc</button>
+                  </div>
+                  <input class="form-input text-sm" type="number" id="dash-search-cbm" step="0.1" min="0.1" placeholder="e.g. 2" value="2" required />
+                </div>
+
+                <!-- Cargo Weight (kg) -->
+                <div class="form-group mb-0">
+                  <label class="form-label text-xs" for="dash-search-weight">Weight (kg)</label>
+                  <input class="form-input text-sm" type="number" id="dash-search-weight" min="1" placeholder="e.g. 350" value="350" />
+                </div>
+
+                <!-- Cargo Type -->
+                <div class="form-group mb-0">
+                  <label class="form-label text-xs" for="dash-search-type">Cargo Type</label>
+                  <select class="form-select text-sm" id="dash-search-type">
+                    <option value="Textiles">Textiles</option>
+                    <option value="Apparel">Apparel</option>
+                    <option value="Agriculture">Agriculture / Spices</option>
+                    <option value="Machinery">Machinery &amp; Parts</option>
+                    <option value="Food">Food Products</option>
+                    <option value="General Cargo">General Cargo</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-3 border-t border-slate-100">
+                <div class="flex items-center gap-2 text-xs text-muted">
+                  <span class="badge badge-info">Corridor Match</span>
+                  <span>Instant volumetric booking validation enabled</span>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm px-6 py-2.5 font-semibold shadow-sm">
+                  🔍 Search Available Space
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- MAIN 2-COLUMN LAYOUT -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- LEFT / PRIMARY COLUMN (8 COLS) -->
+          <div class="lg:col-span-8 space-y-6">
+
+            <!-- 8. ACTIVE SHIPMENT TRACKING -->
+            <section>
+              <div class="flex items-center justify-between mb-3">
+                <h2 class="card-title text-navy flex items-center gap-2">
+                  <span>📍</span> Active Shipment Tracking
+                </h2>
+                <a href="bookings.html" class="text-xs font-semibold text-blue-700 hover:underline">All Shipments →</a>
+              </div>
+              <div id="active-shipment-container">
+                <!-- Dynamically rendered via TraderApp.initDashboard() -->
+              </div>
+            </section>
+
+            <!-- 5 & 6. RECOMMENDED CARGO SPACE (WITH SMART MATCHING) -->
+            <section>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div>
+                  <h2 class="card-title text-navy flex items-center gap-2">
+                    <span>✨</span> Recommended Cargo Space
+                  </h2>
+                  <p class="text-xs text-muted">Live matching vehicles with shared space on your trade corridors.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-muted">Demo mock capacity</span>
+                  <a href="search-space.html" class="btn btn-outline btn-sm">View All Space →</a>
+                </div>
+              </div>
+
+              <!-- Recommended Cards Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="recommended-spaces-container">
+                <!-- Dynamically rendered via TraderApp.initDashboard() -->
+              </div>
+            </section>
+
+            <!-- 7. MY RECENT BOOKINGS -->
+            <section>
+              <div class="flex items-center justify-between mb-3">
+                <h2 class="card-title text-navy flex items-center gap-2">
+                  <span>📋</span> My Recent Bookings
+                </h2>
+                <a href="bookings.html" class="text-xs font-semibold text-blue-700 hover:underline">View all bookings →</a>
+              </div>
+
+              <!-- Desktop Table View -->
+              <div class="table-wrap hidden sm:block">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Booking ID</th>
+                      <th>Route</th>
+                      <th>Space</th>
+                      <th>Pickup Date</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-bookings-tbody">
+                    <!-- Dynamically rendered via TraderApp.initDashboard() -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Mobile Cards View -->
+              <div class="sm:hidden" id="recent-bookings-mobile">
+                <!-- Dynamically rendered via TraderApp.initDashboard() -->
+              </div>
+            </section>
+
+            <!-- 14. CARGO SPACE EXPLANATION -->
+            <section class="card p-5 bg-gradient-to-br from-blue-50/70 via-white to-slate-50 border border-blue-200/70">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-start gap-3.5">
+                  <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-2xl flex-shrink-0">
+                    📦
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-navy text-base mb-1">What does CBM mean?</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed max-w-xl">
+                      <strong>CBM (Cubic Meter)</strong> measures the physical volume of your cargo. CargoHive uses CBM to help traders book only the space they need, rather than paying for an entire empty container.
+                    </p>
+                    <div class="mt-2.5 flex flex-wrap items-center gap-3 text-xs text-slate-700">
+                      <span class="px-2.5 py-1 rounded-md bg-white border border-slate-200 font-mono text-[11px] text-navy font-semibold">
+                        Length (m) × Width (m) × Height (m) = CBM
+                      </span>
+                      <span class="text-muted">Example: 2m × 1m × 1m = 2 CBM</span>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm whitespace-nowrap self-start sm:self-center font-semibold" onclick="CS.openModal('cbm-calc-modal')">
+                  Calculate Cargo Space →
+                </button>
+              </div>
+            </section>
+
+            <!-- 15. SMART BOOKING VALIDATION PREVIEW -->
+            <section class="card p-5 bg-white border border-slate-200">
+              <div class="flex items-start justify-between gap-4 mb-3">
+                <div>
+                  <h3 class="font-bold text-navy text-base flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">✓</span>
+                    Smart Booking Validation
+                  </h3>
+                  <p class="text-xs text-slate-600 mt-0.5">
+                    CargoHive validates key shipment conditions before a booking is confirmed to ensure smooth loading and zero transit delays.
+                  </p>
+                </div>
+                <a href="../how-it-works.html" class="btn btn-outline btn-sm whitespace-nowrap">
+                  Learn How It Works →
+                </a>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2 border-t border-slate-100">
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-50/70 text-emerald-900 text-xs font-medium border border-emerald-100">
+                  <span class="text-emerald-700 font-bold">✓</span> Required space available
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-50/70 text-emerald-900 text-xs font-medium border border-emerald-100">
+                  <span class="text-emerald-700 font-bold">✓</span> Weight within vehicle limit
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-50/70 text-emerald-900 text-xs font-medium border border-emerald-100">
+                  <span class="text-emerald-700 font-bold">✓</span> Route compatible
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-50/70 text-emerald-900 text-xs font-medium border border-emerald-100">
+                  <span class="text-emerald-700 font-bold">✓</span> Pickup time available
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-50/70 text-emerald-900 text-xs font-medium border border-emerald-100">
+                  <span class="text-emerald-700 font-bold">✓</span> Delivery schedule compatible
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-50/70 text-emerald-900 text-xs font-medium border border-emerald-100">
+                  <span class="text-emerald-700 font-bold">✓</span> Cargo type supported
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- RIGHT / SIDEBAR COLUMN (4 COLS) -->
+          <div class="lg:col-span-4 space-y-6">
+
+            <!-- 10. AVAILABLE SPACE SUMMARY -->
+            <div class="card p-5 bg-white border border-slate-200">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-navy text-sm flex items-center gap-2">
+                  <span>📊</span> Available Shared Capacity
+                </h3>
+                <span class="badge badge-info text-[10px]">Today's Network</span>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 mb-3">
+                <div class="text-xs text-muted font-medium">Today's Available Space</div>
+                <div class="text-2xl font-bold text-navy mt-1" id="cap-today-available">48 CBM</div>
+                <div class="text-xs text-emerald-600 font-medium mt-0.5" id="cap-vehicles-count">Across 12 matching vehicles</div>
+              </div>
+
+              <!-- Multi-segment visual progress bar -->
+              <div class="mb-3">
+                <div class="flex justify-between text-xs text-muted mb-1 font-medium">
+                  <span>Capacity Breakdown</span>
+                  <span>48 CBM Live</span>
+                </div>
+                <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex">
+                  <div class="h-full bg-blue-600" style="width: 79%" title="Road Transport: 38 CBM"></div>
+                  <div class="h-full bg-sky-400" style="width: 21%" title="Container Space: 10 CBM"></div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="p-2.5 rounded-lg bg-blue-50/80 border border-blue-100">
+                  <div class="flex items-center gap-1.5 text-blue-900 font-semibold mb-0.5">
+                    <span class="w-2 h-2 rounded-full bg-blue-600"></span> Road Transport
+                  </div>
+                  <div class="text-base font-bold text-navy" id="cap-road-cbm">38 CBM</div>
+                </div>
+                <div class="p-2.5 rounded-lg bg-sky-50/80 border border-sky-100">
+                  <div class="flex items-center gap-1.5 text-sky-900 font-semibold mb-0.5">
+                    <span class="w-2 h-2 rounded-full bg-sky-400"></span> Container Space
+                  </div>
+                  <div class="text-base font-bold text-navy" id="cap-container-cbm">10 CBM</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 9. SMART CARGOHIVE INSIGHTS -->
+            <div class="card p-5 bg-white border border-slate-200">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-navy text-sm flex items-center gap-2">
+                  <span>💡</span> CargoHive Insights
+                </h3>
+                <span class="text-xs text-muted">Platform telemetry</span>
+              </div>
+              <div class="space-y-2.5" id="insights-container">
+                <!-- Dynamically rendered via TraderApp.initDashboard() -->
+              </div>
+            </div>
+
+            <!-- 11. NOTIFICATIONS PREVIEW -->
+            <div class="card p-5 bg-white border border-slate-200">
+              <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-navy text-sm flex items-center gap-2">
+                  <span>🔔</span> Recent Notifications
+                </h3>
+                <a href="notifications.html" class="text-xs font-semibold text-blue-700 hover:underline">View all</a>
+              </div>
+              <div class="space-y-1" id="recent-notifications-container">
+                <!-- Dynamically rendered via TraderApp.initDashboard() -->
+              </div>
+              <div class="mt-3 pt-2 text-center">
+                <a href="notifications.html" class="btn btn-secondary btn-sm btn-block text-xs">
+                  View All Notifications
+                </a>
+              </div>
+            </div>
+
+            <!-- 12. PAYMENT SUMMARY -->
+            <div class="card p-5 bg-white border border-slate-200">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-navy text-sm flex items-center gap-2">
+                  <span>💳</span> Payment Summary
+                </h3>
+                <span class="badge badge-slate text-[10px]">Mock Ledger</span>
+              </div>
+              <div class="space-y-2.5 text-xs">
+                <div class="flex justify-between items-center p-2.5 rounded-lg bg-amber-50/80 border border-amber-100 text-amber-900">
+                  <span class="font-medium">Pending Payment</span>
+                  <span class="font-bold text-amber-700 text-sm" id="pay-pending">₹2,550</span>
+                </div>
+                <div class="flex justify-between items-center p-2.5 rounded-lg bg-emerald-50/80 border border-emerald-100 text-emerald-900">
+                  <span class="font-medium">Paid This Month</span>
+                  <span class="font-bold text-emerald-700 text-sm" id="pay-month">₹8,450</span>
+                </div>
+                <div class="flex justify-between items-center p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-slate-800">
+                  <span class="font-medium">Total Shipment Spend</span>
+                  <span class="font-bold text-navy text-sm" id="pay-total">₹21,700</span>
+                </div>
+              </div>
+              <div class="mt-3 pt-2">
+                <a href="bookings.html" class="btn btn-outline btn-sm btn-block text-xs">
+                  View Bookings Ledger
+                </a>
+              </div>
+            </div>
+
+            <!-- 13. CHAT PREVIEW -->
+            <div class="card p-5 bg-white border border-slate-200">
+              <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-navy text-sm flex items-center gap-2">
+                  <span>💬</span> Recent Messages
+                </h3>
+                <a href="chat.html" class="text-xs font-semibold text-blue-700 hover:underline">Open Chat</a>
+              </div>
+              <div class="space-y-1.5" id="recent-messages-container">
+                <!-- Dynamically rendered via TraderApp.initDashboard() -->
+              </div>
+              <div class="mt-3 pt-2 text-center">
+                <a href="chat.html" class="btn btn-secondary btn-sm btn-block text-xs">
+                  Open Chat Console
+                </a>
+              </div>
+            </div>
+
           </div>
         </div>
-
-        <div class="card-header" style="margin-bottom:16px">
-          <h2 class="card-title">Available Cargo Space</h2>
-          <a href="search-space.html" class="btn btn-outline btn-sm">View all</a>
-        </div>
-        <div id="available-spaces" class="grid-2"></div>
       </main>
+    </div>
+  </div>
+
+  <!-- 14. INTERACTIVE CBM CALCULATOR MODAL -->
+  <div class="modal-overlay" id="cbm-calc-modal">
+    <div class="modal max-w-md">
+      <div class="modal-header">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">📐</span>
+          <h3 class="modal-title m-0">Cargo CBM Calculator</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="CS.closeModal('cbm-calc-modal')" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body p-0 mb-4">
+        <p class="text-xs text-muted mb-4">
+          Calculate the cubic volume of your packages to book only the exact space you require. Formula: <strong>Length × Width × Height × Quantity</strong>.
+        </p>
+
+        <!-- Quick Presets -->
+        <div class="mb-4">
+          <div class="text-xs font-semibold text-slate-700 mb-1.5">Quick Presets:</div>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" class="calc-preset-btn text-[11px] px-2.5 py-1 rounded-md bg-slate-100 hover:bg-blue-50 hover:text-blue-700 font-medium transition" data-l="1.2" data-w="1.0" data-h="1.5" data-q="1">
+              Standard Pallet (1.2×1.0×1.5m)
+            </button>
+            <button type="button" class="calc-preset-btn text-[11px] px-2.5 py-1 rounded-md bg-slate-100 hover:bg-blue-50 hover:text-blue-700 font-medium transition" data-l="0.5" data-w="0.4" data-h="0.4" data-q="10">
+              Carton Box (10 pcs)
+            </button>
+            <button type="button" class="calc-preset-btn text-[11px] px-2.5 py-1 rounded-md bg-slate-100 hover:bg-blue-50 hover:text-blue-700 font-medium transition" data-l="1.0" data-w="0.8" data-h="0.8" data-q="2">
+              Textile Bale (2 pcs)
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div class="form-group mb-0">
+            <label class="form-label text-xs" for="calc-length">Length (meters)</label>
+            <input class="form-input text-sm" type="number" step="0.05" id="calc-length" value="1.2" min="0.01" />
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label text-xs" for="calc-width">Width (meters)</label>
+            <input class="form-input text-sm" type="number" step="0.05" id="calc-width" value="1.0" min="0.01" />
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label text-xs" for="calc-height">Height (meters)</label>
+            <input class="form-input text-sm" type="number" step="0.05" id="calc-height" value="1.5" min="0.01" />
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label text-xs" for="calc-qty">Quantity</label>
+            <input class="form-input text-sm" type="number" id="calc-qty" value="1" min="1" />
+          </div>
+        </div>
+
+        <!-- Real-time calculation card -->
+        <div class="p-3.5 rounded-xl bg-blue-50/80 border border-blue-200 text-center">
+          <div class="text-xs text-blue-800 font-medium">Calculated Required Volume</div>
+          <div class="text-3xl font-extrabold text-blue-700 mt-0.5">
+            <span id="calc-result-cbm">1.8</span> <span class="text-base font-semibold">CBM</span>
+          </div>
+          <div class="text-[11px] text-blue-600 mt-1">
+            Exact shared vehicle capacity required
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="CS.closeModal('cbm-calc-modal')">Close</button>
+        <button type="button" class="btn btn-primary btn-sm font-semibold" id="calc-apply-btn">
+          Use in Search Form →
+        </button>
+      </div>
     </div>
   </div>
 
   <script src="../js/common.js"></script>
   <script src="../js/trader.js"></script>
   <script>
+    // Authentication & session validation
     const session = CS.requireRole("trader", "login.html");
     if (session) {
       CS.initSidebar();
       CS.setActiveNav("dashboard");
-      document.getElementById("topbar-name").textContent = session.name || session.businessName || "Trader";
-      document.getElementById("greeting").textContent =
-        CS.greeting() + ", " + (session.name || "Trader").split(" ")[0];
 
-      let bookings = CS.getBookings().filter((b) => b.traderId === session.id);
-      if (!bookings.length && session.email === "trader@cargohive.example") {
-        bookings = CS.getBookings().filter((b) => b.traderId === "tr_demo");
-      }
-      const active = bookings.filter((b) => ["Confirmed", "In Transit"].includes(b.status)).length;
-      const upcoming = bookings.filter((b) => b.status === "Confirmed").length;
-      const completed = bookings.filter((b) => b.status === "Delivered").length;
-      const routes = new Set(bookings.map((b) => CS.formatRoute(b.route))).size;
-      document.getElementById("stat-active").textContent = active;
-      document.getElementById("stat-upcoming").textContent = upcoming;
-      document.getElementById("stat-completed").textContent = completed;
-      document.getElementById("stat-routes").textContent = routes || 3;
-
-      TraderApp.renderAvailableSpaces(document.getElementById("available-spaces"), 4);
+      // Initialize the enhanced trader dashboard
+      TraderApp.initDashboard();
     }
   </script>
 </body>

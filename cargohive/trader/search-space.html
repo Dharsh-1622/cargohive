@@ -185,6 +185,27 @@
         runSearch();
       });
 
+      // Prefill from query params or localStorage search
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        let storedSearch = {};
+        try {
+          storedSearch = JSON.parse(localStorage.getItem("cargoHiveSearch") || "{}");
+        } catch (e) {}
+
+        const fromVal = urlParams.get("from") || storedSearch.from;
+        const toVal = urlParams.get("to") || storedSearch.to;
+        const dateVal = urlParams.get("pickupDate") || storedSearch.pickupDate;
+        const cbmVal = urlParams.get("cbm") || storedSearch.cbm;
+        const weightVal = urlParams.get("weight") || storedSearch.weight;
+
+        if (fromVal) document.getElementById("from").value = fromVal;
+        if (toVal) document.getElementById("to").value = toVal;
+        if (dateVal && document.getElementById("pickupDate")) document.getElementById("pickupDate").value = dateVal;
+        if (cbmVal) document.getElementById("cbm").value = cbmVal;
+        if (weightVal) document.getElementById("weight").value = weightVal;
+      } catch (e) {}
+
       runSearch();
     }
   </script>
