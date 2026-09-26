@@ -44,6 +44,14 @@
   <script>
     const session = CS.requireRole('provider', 'login.html');
     if (session) {
+      const currentProvider = CS.getProviders().find(p => p.id === session.id);
+      if (currentProvider && currentProvider.status === 'Pending') {
+        CS.toast('Your account is pending admin approval.', 'warning');
+        CS.logout('login.html');
+      } else if (currentProvider && currentProvider.status === 'Rejected') {
+        CS.toast('Your account registration was rejected.', 'error');
+        CS.logout('login.html');
+      }
       CS.initSidebar(); CS.setActiveNav('dashboard');
       document.getElementById('greet').textContent = 'Welcome back!';
       document.getElementById('company').textContent = session.companyName || '';

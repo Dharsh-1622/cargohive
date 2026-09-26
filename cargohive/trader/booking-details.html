@@ -64,14 +64,18 @@
                 <div><div class="info-label">Weight</div><div class="info-value">${b.weight} KG</div></div>
                 <div><div class="info-label">Vehicle</div><div class="info-value">${b.vehicleNumber}</div></div>
                 <div><div class="info-label">Payment</div><div class="info-value">${CS.statusBadge(b.paymentStatus)} ${b.paymentMethod||''}</div></div>
+                <div><div class="info-label">Total Amount</div><div class="info-value font-bold text-navy">${CS.formatINR(b.total)}</div></div>
+                <div><div class="info-label">Advance (50%)</div><div class="info-value text-sm text-emerald-700 font-semibold">${CS.formatINR(b.advanceAmount || Math.round(b.total * 0.5))}</div></div>
+                <div><div class="info-label">Remaining (50%)</div><div class="info-value text-sm ${b.paymentStatus === 'Fully Paid' ? 'text-slate-400' : 'text-amber-800'} font-semibold">${b.paymentStatus === 'Fully Paid' ? '₹0 (Settled)' : CS.formatINR(b.remainingAmount || (b.total - Math.round(b.total * 0.5)))}</div></div>
                 <div><div class="info-label">Pickup</div><div class="info-value text-sm">${b.pickup}<br/>${b.pickupDate}</div></div>
                 <div><div class="info-label">Delivery</div><div class="info-value text-sm">${b.delivery}<br/>${b.deliveryDate}</div></div>
-                <div><div class="info-label">Amount</div><div class="info-value">${CS.formatINR(b.total)}</div></div>
-                <div><div class="info-label">Txn ID</div><div class="info-value text-sm">${b.txnId||'—'}</div></div>
+                <div><div class="info-label">Txn ID</div><div class="info-value text-sm font-mono">${b.finalTxnId || b.advanceTxnId || b.txnId || '—'}</div></div>
               </div>
               <div class="flex gap-2 mt-6" style="flex-wrap:wrap">
-                <a class="btn btn-outline" href="chat.html">Chat</a>
+                ${b.status === 'Delivered' && b.paymentStatus !== 'Fully Paid' ? `<a class="btn btn-primary" href="payment.html?id=${encodeURIComponent(b.id)}&type=final">Pay Remaining 50% (Final Payment)</a>` : ''}
+                ${b.paymentStatus === 'Payment Pending' ? `<a class="btn btn-primary" href="payment.html?id=${encodeURIComponent(b.id)}&type=advance">Pay 50% Advance</a>` : ''}
                 <button class="btn btn-secondary" id="receipt">Download Receipt</button>
+                <a class="btn btn-outline" href="chat.html">Chat</a>
                 ${['Delivered','Cancelled'].includes(b.status)?'':`<button class="btn btn-danger" id="cancel-btn">Cancel Booking</button>`}
               </div>
             </div>
@@ -87,7 +91,24 @@
               </div>
             </div>
           </div>`;
-        document.getElementById('receipt')?.addEventListener('click', () => CS.toast('Receipt downloaded (demo PDF)', 'success'));
+        document.getElementById('receipt')?.addEventListener('click', () => {
+          CS.downloadReceipt({
+            bookingId: b.id,
+            trader: b.traderName || session.businessName || session.name || "Trader",
+            provider: b.providerName,
+            route: b.route,
+            cargo: b.cargoName,
+            cbm: b.cbm,
+            weight: b.weight,
+            totalAmount: b.total,
+            amountPaid: b.amountPaid !== undefined ? b.amountPaid : (b.paymentStatus === 'Fully Paid' ? b.total : Math.round(b.total * 0.5)),
+            remainingAmount: b.paymentStatus === 'Fully Paid' ? 0 : (b.remainingAmount !== undefined ? b.remainingAmount : Math.round(b.total * 0.5)),
+            paymentStatus: b.paymentStatus || 'Advance Paid',
+            paymentDate: b.finalPaymentDate || b.advancePaymentDate || b.createdAt,
+            transactionId: b.finalTxnId || b.advanceTxnId || b.txnId || 'TXN-DEMO',
+          });
+          CS.toast('Receipt downloaded successfully', 'success');
+        });
         document.getElementById('cancel-btn')?.addEventListener('click', () => CS.openModal('cancel-modal'));
         document.getElementById('confirm-cancel')?.addEventListener('click', () => {
           TraderApp.cancelBooking(b.id);

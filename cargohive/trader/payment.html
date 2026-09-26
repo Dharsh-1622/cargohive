@@ -19,6 +19,8 @@
     }
   </script>
   <link rel="stylesheet" href="../css/style.css" />
+  <!-- Razorpay Checkout Script (Test Mode) -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -53,48 +55,95 @@
           </button>
           <div>
             <div class="font-semibold text-navy" id="topbar-name">Trader</div>
-            <div class="text-xs text-muted">Secure checkout</div>
+            <div class="text-xs text-muted">Razorpay Test Mode Checkout</div>
           </div>
         </div>
       </header>
 
       <main class="page-body">
-        <h1 class="page-title">Payment</h1>
-        <p class="page-sub">Choose a payment method. This is a demo — no real charges.</p>
+        <h1 class="page-title" id="payment-page-title">Payment</h1>
+        <p class="page-sub" id="payment-page-sub">Razorpay Test Mode — 50% split payment structure.</p>
+
+        <!-- Error / Alert Banner -->
+        <div id="pay-alert-banner" class="hidden mb-4 p-4 rounded-lg text-sm font-medium"></div>
 
         <div class="grid-2" style="align-items:start" id="pay-root">
           <div class="card">
-            <h2 class="card-title mb-4">Payment method</h2>
+            <div class="flex-between mb-4">
+              <h2 class="card-title mb-0" style="margin:0">Payment method</h2>
+              <span class="badge badge-info" style="font-size:0.75rem">Razorpay Test Mode</span>
+            </div>
+
+            <div class="notice notice-info mb-4" style="font-size:0.85rem">
+              <strong>Split Payment Policy:</strong><br/>
+              • Advance = <strong>50%</strong> (Paid now to confirm booking)<br/>
+              • Remaining = <strong>50%</strong> (Paid upon Delivery)
+            </div>
+
             <label class="pay-method selected">
               <input type="radio" name="pay" value="UPI" checked />
               <div>
-                <div class="font-semibold">UPI</div>
-                <div class="text-xs text-muted">GPay, PhonePe, BHIM — instant</div>
+                <div class="font-semibold">UPI (Razorpay)</div>
+                <div class="text-xs text-muted">GPay, PhonePe, Paytm, QR — Instant</div>
               </div>
             </label>
             <label class="pay-method">
               <input type="radio" name="pay" value="Card" />
               <div>
-                <div class="font-semibold">Credit / Debit Card</div>
-                <div class="text-xs text-muted">Visa, Mastercard, RuPay</div>
+                <div class="font-semibold">Credit / Debit Card (Razorpay)</div>
+                <div class="text-xs text-muted">Visa, Mastercard, RuPay, Corporate</div>
               </div>
             </label>
             <label class="pay-method">
               <input type="radio" name="pay" value="Net Banking" />
               <div>
-                <div class="font-semibold">Net Banking</div>
-                <div class="text-xs text-muted">All major Indian banks</div>
+                <div class="font-semibold">Net Banking (Razorpay)</div>
+                <div class="text-xs text-muted">HDFC, SBI, ICICI, Axis and 50+ banks</div>
               </div>
             </label>
-            <button type="button" class="btn btn-primary btn-block btn-lg mt-4" id="pay-btn">Pay Now</button>
+
+            <button type="button" class="btn btn-primary btn-block btn-lg mt-4" id="pay-btn">
+              Proceed to Razorpay Checkout
+            </button>
+
             <div id="pay-loading" class="hidden mt-6" style="text-align:center">
               <div class="loading-spinner"></div>
-              <p class="text-sm text-muted mt-3">Processing payment securely…</p>
+              <p class="text-sm text-muted mt-3" id="pay-loading-text">Connecting to Razorpay gateway…</p>
             </div>
           </div>
+
           <div class="card" id="price-card"></div>
         </div>
       </main>
+    </div>
+  </div>
+
+  <!-- Fallback Modal for environments where Razorpay CDN is blocked -->
+  <div class="modal-overlay" id="sim-razorpay-modal">
+    <div class="modal" style="max-width:440px">
+      <div style="background:#0b1f3a;color:white;padding:16px 20px;border-radius:10px 10px 0 0;margin:-20px -20px 16px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <strong style="font-size:1.1rem">Razorpay [Test Mode]</strong>
+          <div style="font-size:0.75rem;opacity:0.8">CargoHive Logistics Payment Gateway</div>
+        </div>
+        <span style="background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:999px;font-size:0.75rem;font-weight:700">TEST</span>
+      </div>
+      <div class="modal-body" style="font-size:0.9rem">
+        <div style="background:#f1f5f9;padding:12px;border-radius:8px;margin-bottom:12px">
+          <div class="flex-between text-xs text-muted mb-1"><span>Order ID</span><strong id="sim-order-id" class="text-navy">-</strong></div>
+          <div class="flex-between text-xs text-muted mb-1"><span>Payment Stage</span><strong id="sim-payment-stage" class="text-navy">-</strong></div>
+          <div class="flex-between text-base font-bold text-navy mt-2 pt-2" style="border-top:1px dashed #cbd5e1">
+            <span>Payable Amount</span>
+            <span id="sim-payable-amount" class="text-blue-700">₹0</span>
+          </div>
+        </div>
+        <p class="text-xs text-muted">Test mode simulator active. Choose an action to simulate the Razorpay transaction:</p>
+      </div>
+      <div class="modal-actions" style="flex-direction:column;gap:8px">
+        <button class="btn btn-primary w-full" id="sim-btn-success">Simulate Successful Payment ✓</button>
+        <button class="btn btn-outline w-full" id="sim-btn-fail" style="color:#dc2626;border-color:#fca5a5">Simulate Failed Payment ✗</button>
+        <button class="btn btn-secondary w-full" id="sim-btn-cancel">Cancel / Dismiss Modal</button>
+      </div>
     </div>
   </div>
 
@@ -107,54 +156,455 @@
       CS.setActiveNav("bookings");
       document.getElementById("topbar-name").textContent = session.name || "Trader";
 
-      const pending = TraderApp.getPendingBooking();
-      if (!pending) {
-        CS.toast("No pending booking", "warning");
-        setTimeout(() => (location.href = "search-space.html"), 700);
+      // 1. Identify Context: Existing Booking (e.g. final payment or specific advance) OR Pending Booking
+      const urlParams = new URLSearchParams(location.search);
+      const urlBookingId = urlParams.get("id");
+      const requestedPaymentType = urlParams.get("type") === "final" ? "final" : "advance";
+
+      let bookingTarget = null;
+      let isExistingBooking = false;
+
+      if (urlBookingId) {
+        bookingTarget = CS.getBooking(urlBookingId);
+        if (bookingTarget) isExistingBooking = true;
+      }
+
+      if (!bookingTarget) {
+        bookingTarget = TraderApp.getPendingBooking();
+      }
+
+      // If no pending booking exists, provide a default demo pending booking (2.40 CBM × ₹1,200 = ₹2,880)
+      if (!bookingTarget) {
+        bookingTarget = {
+          bookingPreviewId: "BK-" + new Date().getFullYear() + "-" + Math.floor(1000 + Math.random() * 9000),
+          providerName: "GV Transport",
+          vehicleId: "veh_001",
+          vehicleNumber: "TN-33-AB-4521",
+          route: ["Tiruppur", "Salem", "Chennai"],
+          cargoName: "Cotton Textiles",
+          cargoCategory: "Textiles",
+          cbm: 2.4,
+          weight: 350,
+          pricePerCbm: 1200,
+          total: 2880,
+          pickup: "Tiruppur Textile Hub",
+          delivery: "Chennai Port CFS",
+          pickupDate: new Date().toISOString().split("T")[0],
+          deliveryDate: new Date(Date.now() + 86400000).toISOString().split("T")[0],
+        };
+        TraderApp.savePendingBooking(bookingTarget);
+      }
+
+      // Calculate amounts according to requirements:
+      // Total = CBM * Price (e.g. 2.40 CBM * ₹1,200 = ₹2,880)
+      const cbm = Number(bookingTarget.cbm || 2.4);
+      const pricePerCbm = Number(bookingTarget.pricePerCbm || bookingTarget.pricePerCBM || 1200);
+      const totalAmount = bookingTarget.total ? Number(bookingTarget.total) : Math.round(cbm * pricePerCbm);
+      const advanceAmount = Math.round(totalAmount * 0.5);
+      const remainingAmount = totalAmount - advanceAmount;
+
+      const currentBookingId = bookingTarget.id || bookingTarget.bookingPreviewId || ("BK-" + Date.now().toString().slice(-6));
+      const currentShipmentStatus = bookingTarget.status || "Pending";
+      const currentPaymentStatus = bookingTarget.paymentStatus || "Payment Pending";
+
+      // Determine paymentType: if requested as final or if shipment is delivered and advance paid
+      let paymentType = requestedPaymentType;
+      if (!urlParams.get("type") && currentShipmentStatus === "Delivered" && currentPaymentStatus === "Advance Paid") {
+        paymentType = "final";
+      }
+
+      const payableAmount = paymentType === "final" ? remainingAmount : advanceAmount;
+
+      // Update Page Headers
+      if (paymentType === "final") {
+        document.getElementById("payment-page-title").textContent = "Final Payment (50%)";
+        document.getElementById("payment-page-sub").textContent = `Settle remaining 50% balance for delivered shipment ${currentBookingId}.`;
       } else {
-        document.getElementById("price-card").innerHTML = `
-          <h2 class="card-title mb-4">Order summary</h2>
-          <div class="text-sm text-muted mb-1">${pending.providerName} · ${pending.cargoName}</div>
-          <div class="route-line text-sm mb-4">${CS.formatRoute(pending.route)}</div>
-          <div class="flex-between mb-2"><span class="text-muted">Subtotal</span><span>${CS.formatINR(pending.amount)}</span></div>
-          <div class="flex-between mb-2"><span class="text-muted">Service fee</span><span>${CS.formatINR(pending.serviceFee)}</span></div>
-          <div class="flex-between mt-4" style="border-top:1px solid var(--cs-slate-200);padding-top:14px">
-            <strong>Amount payable</strong>
-            <span class="price-tag">${CS.formatINR(pending.total)}</span>
-          </div>`;
+        document.getElementById("payment-page-title").textContent = "Advance Payment (50%)";
+        document.getElementById("payment-page-sub").textContent = `Pay 50% advance to confirm your shared cargo booking on ${bookingTarget.vehicleNumber || 'carrier'}.`;
+      }
 
-        document.querySelectorAll(".pay-method").forEach((el) => {
-          el.addEventListener("click", () => {
-            document.querySelectorAll(".pay-method").forEach((m) => m.classList.remove("selected"));
-            el.classList.add("selected");
-            el.querySelector("input").checked = true;
-          });
+      // Validation Checks & Warnings
+      const alertBanner = document.getElementById("pay-alert-banner");
+      const payBtn = document.getElementById("pay-btn");
+
+      let isActionBlocked = false;
+      let blockReason = "";
+
+      if (paymentType === "final") {
+        if (currentShipmentStatus !== "Delivered") {
+          isActionBlocked = true;
+          blockReason = `Final payment is available only when shipment status is Delivered. Current shipment status: <strong>${currentShipmentStatus}</strong>.`;
+        } else if (currentPaymentStatus === "Fully Paid") {
+          isActionBlocked = true;
+          blockReason = `This booking is already <strong>Fully Paid</strong>. No additional payment is required.`;
+        }
+      } else {
+        if (currentPaymentStatus === "Advance Paid") {
+          isActionBlocked = true;
+          blockReason = `Advance payment (50%) has already been completed for booking <strong>${currentBookingId}</strong>.`;
+        } else if (currentPaymentStatus === "Fully Paid") {
+          isActionBlocked = true;
+          blockReason = `This booking is already <strong>Fully Paid</strong>.`;
+        }
+      }
+
+      if (isActionBlocked) {
+        alertBanner.innerHTML = blockReason;
+        alertBanner.className = "mb-4 p-4 rounded-lg text-sm font-medium bg-amber-50 text-amber-900 border border-amber-200 block";
+        payBtn.disabled = true;
+        payBtn.textContent = paymentType === "final" ? "Final Payment Not Available" : "Payment Already Completed";
+        payBtn.style.opacity = "0.6";
+        payBtn.style.cursor = "not-allowed";
+      } else {
+        payBtn.textContent = `Pay ${CS.formatINR(payableAmount)} via Razorpay`;
+      }
+
+      // 2. Render Order Summary with Split Payment Breakdown
+      document.getElementById("price-card").innerHTML = `
+        <h2 class="card-title mb-4">Order Summary</h2>
+        <div class="text-sm font-bold text-navy mb-1">${bookingTarget.providerName || "Provider"} · ${bookingTarget.cargoName || "Cargo"}</div>
+        <div class="route-line text-sm mb-4">${CS.formatRoute(bookingTarget.route)}</div>
+
+        <div class="grid-2 gap-2 p-3 bg-slate-50 rounded-lg text-xs mb-3 border border-slate-200/80">
+          <div><span class="text-muted">Booking ID:</span> <strong>${currentBookingId}</strong></div>
+          <div><span class="text-muted">Shipment Status:</span> ${CS.statusBadge(currentShipmentStatus)}</div>
+          <div><span class="text-muted">Volume (CBM):</span> <strong>${cbm} CBM</strong></div>
+          <div><span class="text-muted">Weight (KG):</span> <strong>${bookingTarget.weight || 0} KG</strong></div>
+        </div>
+
+        <div class="flex-between mb-2 text-sm">
+          <span class="text-muted">Rate Calculation</span>
+          <span>${cbm} CBM × ₹${pricePerCbm.toLocaleString("en-IN")}</span>
+        </div>
+        <div class="flex-between mb-2 text-sm">
+          <span class="text-muted">Total Booking Cost</span>
+          <strong class="text-navy">${CS.formatINR(totalAmount)}</strong>
+        </div>
+
+        <div class="my-3 pt-3 border-t border-slate-200">
+          <div class="text-xs uppercase font-bold text-slate-400 mb-2 tracking-wider">50/50 Split Payment Structure</div>
+          <div class="flex-between mb-2 text-sm ${paymentType === 'advance' ? 'font-bold text-blue-700 bg-blue-50 p-2 rounded' : 'text-slate-600'}">
+            <span>Advance (50% Due Now)</span>
+            <span>${CS.formatINR(advanceAmount)}</span>
+          </div>
+          <div class="flex-between mb-2 text-sm ${paymentType === 'final' ? 'font-bold text-blue-700 bg-blue-50 p-2 rounded' : 'text-slate-600'}">
+            <span>Remaining (50% Due upon Delivery)</span>
+            <span>${CS.formatINR(remainingAmount)}</span>
+          </div>
+        </div>
+
+        <div class="flex-between mt-4 pt-3 border-t border-slate-200">
+          <div>
+            <div class="font-bold text-navy text-base">Payable Now</div>
+            <div class="text-xs text-muted font-medium">${paymentType === 'final' ? 'Final 50% Settlement' : '50% Initial Advance'}</div>
+          </div>
+          <span class="price-tag" style="font-size:1.4rem">${CS.formatINR(payableAmount)}</span>
+        </div>
+      `;
+
+      // Payment method selector
+      document.querySelectorAll(".pay-method").forEach((el) => {
+        el.addEventListener("click", () => {
+          document.querySelectorAll(".pay-method").forEach((m) => m.classList.remove("selected"));
+          el.classList.add("selected");
+          el.querySelector("input").checked = true;
         });
+      });
 
-        document.getElementById("pay-btn").addEventListener("click", () => {
-          const method = document.querySelector('input[name="pay"]:checked').value;
-          pending.paymentMethod = method;
-          TraderApp.savePendingBooking(pending);
+      // 3. Razorpay Checkout Handler
+      payBtn.addEventListener("click", async () => {
+        if (isActionBlocked) return;
 
-          const btn = document.getElementById("pay-btn");
-          const loading = document.getElementById("pay-loading");
-          btn.disabled = true;
-          loading.classList.remove("hidden");
-          CS.toast("Initiating " + method + " payment…", "info");
+        const method = document.querySelector('input[name="pay"]:checked')?.value || "UPI";
+        const loading = document.getElementById("pay-loading");
+        const loadingText = document.getElementById("pay-loading-text");
 
-          setTimeout(() => {
-            const booking = TraderApp.createBookingFromPending();
-            if (!booking) {
-              CS.toast("Payment failed — try again", "error");
-              btn.disabled = false;
+        payBtn.disabled = true;
+        loading.classList.remove("hidden");
+        loadingText.textContent = "Creating Razorpay order...";
+        CS.toast(`Initiating ${paymentType === 'final' ? 'final' : 'advance'} payment via Razorpay...`, "info");
+
+        let orderData = null;
+
+        try {
+          // Call backend order creation endpoint
+          const orderRes = await fetch("/api/payment/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              bookingId: currentBookingId,
+              totalAmount: totalAmount,
+              cbm: cbm,
+              pricePerCBM: pricePerCbm,
+              paymentType: paymentType,
+              shipmentStatus: currentShipmentStatus,
+              traderName: session.businessName || session.name,
+              traderEmail: session.email,
+            }),
+          });
+
+          orderData = await orderRes.json();
+
+          if (!orderData.success) {
+            payBtn.disabled = false;
+            loading.classList.add("hidden");
+            CS.toast(orderData.message || "Failed to create payment order.", "error");
+            alertBanner.innerHTML = orderData.message;
+            alertBanner.className = "mb-4 p-4 rounded-lg text-sm font-medium bg-red-50 text-red-900 border border-red-200 block";
+            return;
+          }
+        } catch (fetchErr) {
+          console.warn("Backend order creation warning:", fetchErr);
+          // Fallback mock order if backend is unreachable
+          orderData = {
+            success: true,
+            orderId: "order_mock_" + Date.now(),
+            amount: payableAmount,
+            amountInPaise: payableAmount * 100,
+            currency: "INR",
+            keyId: "rzp_test_51CargoHiveTest",
+            bookingId: currentBookingId,
+            paymentType: paymentType,
+          };
+        }
+
+        loadingText.textContent = "Opening Razorpay checkout...";
+
+        // Success verification helper (called by Razorpay or simulator)
+        async function completePaymentVerification(paymentDetails) {
+          loadingText.textContent = "Verifying transaction with CargoHive...";
+          try {
+            const verifyRes = await fetch("/api/payment/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: paymentDetails.razorpay_order_id || orderData.orderId,
+                razorpay_payment_id: paymentDetails.razorpay_payment_id,
+                razorpay_signature: paymentDetails.razorpay_signature || "",
+                bookingId: currentBookingId,
+                paymentType: paymentType,
+                totalAmount: totalAmount,
+                advanceAmount: advanceAmount,
+                remainingAmount: remainingAmount,
+                amountPaid: payableAmount,
+                traderId: session.id,
+                traderName: session.businessName || session.name,
+                providerId: bookingTarget.providerId || "",
+                providerName: bookingTarget.providerName || "",
+                vehicleId: bookingTarget.vehicleId || "",
+                vehicleNumber: bookingTarget.vehicleNumber || "",
+                route: bookingTarget.route || [],
+                cargoName: bookingTarget.cargoName || "",
+                cbm: cbm,
+                weight: bookingTarget.weight || 0,
+                paymentMethod: "Razorpay (" + method + ")",
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+
+            if (!verifyData.success) {
+              payBtn.disabled = false;
               loading.classList.add("hidden");
+              CS.toast(verifyData.message || "Payment verification failed. Please retry.", "error");
+              alertBanner.innerHTML = verifyData.message || "Payment verification failed.";
+              alertBanner.className = "mb-4 p-4 rounded-lg text-sm font-medium bg-red-50 text-red-900 border border-red-200 block";
               return;
             }
-            CS.toast("Payment successful!", "success");
-            location.href = "payment-success.html";
-          }, 1500);
-        });
-      }
+
+            // Update local storage bookings
+            if (isExistingBooking) {
+              const bookings = CS.getBookings();
+              const b = bookings.find((x) => x.id === currentBookingId);
+              if (b) {
+                if (paymentType === "final") {
+                  b.paymentStatus = "Fully Paid";
+                  b.remainingAmount = 0;
+                  b.amountPaid = totalAmount;
+                  b.finalTxnId = paymentDetails.razorpay_payment_id;
+                  b.finalPaymentDate = new Date().toISOString();
+                } else {
+                  b.paymentStatus = "Advance Paid";
+                  b.status = "Confirmed";
+                  b.advanceAmount = advanceAmount;
+                  b.remainingAmount = remainingAmount;
+                  b.amountPaid = advanceAmount;
+                  b.advanceTxnId = paymentDetails.razorpay_payment_id;
+                  b.advancePaymentDate = new Date().toISOString();
+                }
+                CS.saveBookings(bookings);
+                localStorage.setItem("cs_trader_draft_lastBooking", JSON.stringify(b));
+              }
+            } else {
+              // Create new booking with Advance Paid state
+              TraderApp.createBookingFromPendingWithPayment({
+                status: "Confirmed",
+                paymentStatus: "Advance Paid",
+                totalAmount: totalAmount,
+                advanceAmount: advanceAmount,
+                remainingAmount: remainingAmount,
+                amountPaid: advanceAmount,
+                txnId: paymentDetails.razorpay_payment_id,
+                paymentMethod: "Razorpay (" + method + ")",
+              });
+            }
+
+            // Save receipt in localStorage for payment-success.html
+            const receiptPayload = verifyData.receipt || {
+              company: "CargoHive",
+              receiptNumber: "RCPT-" + Date.now().toString().slice(-6),
+              bookingId: currentBookingId,
+              trader: session.businessName || session.name,
+              provider: bookingTarget.providerName,
+              route: bookingTarget.route,
+              cargo: bookingTarget.cargoName,
+              cbm: cbm,
+              weight: bookingTarget.weight || 0,
+              totalAmount: totalAmount,
+              amountPaid: payableAmount,
+              remainingAmount: paymentType === "final" ? 0 : remainingAmount,
+              paymentStatus: paymentType === "final" ? "Fully Paid" : "Advance Paid",
+              paymentDate: new Date().toISOString(),
+              paymentMethod: "Razorpay (" + method + ")",
+              transactionId: paymentDetails.razorpay_payment_id,
+            };
+
+            localStorage.setItem("cs_last_payment_receipt", JSON.stringify(receiptPayload));
+
+            CS.toast("Payment successful! Redirecting to confirmation...", "success");
+            setTimeout(() => {
+              location.href = "payment-success.html";
+            }, 800);
+          } catch (err) {
+            payBtn.disabled = false;
+            loading.classList.add("hidden");
+            CS.toast("Payment verification error: " + err.message, "error");
+          }
+        }
+
+        // Open Razorpay Standard Checkout
+        if (typeof Razorpay !== "undefined") {
+          try {
+            const rzpOptions = {
+              key: orderData.keyId || "rzp_test_51CargoHiveTest",
+              amount: orderData.amountInPaise,
+              currency: "INR",
+              name: "CargoHive",
+              description: paymentType === "final" ? `Final Settlement (50%) for ${currentBookingId}` : `Advance Payment (50%) for ${currentBookingId}`,
+              order_id: orderData.orderId,
+              prefill: {
+                name: session.businessName || session.name || "Trader",
+                email: session.email || "trader@cargohive.example",
+                contact: session.phone || "9876543210",
+              },
+              theme: {
+                color: "#0b1f3a",
+              },
+              modal: {
+                ondismiss: function () {
+                  payBtn.disabled = false;
+                  loading.classList.add("hidden");
+                  CS.toast("Payment was cancelled. Your booking was not charged. You can retry anytime.", "warning");
+                  alertBanner.innerHTML = "Payment was cancelled. You can select your payment method and retry.";
+                  alertBanner.className = "mb-4 p-4 rounded-lg text-sm font-medium bg-amber-50 text-amber-900 border border-amber-200 block";
+
+                  fetch("/api/payment/failure", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      bookingId: currentBookingId,
+                      paymentType: paymentType,
+                      errorReason: "Payment cancelled by user in checkout modal",
+                      errorCode: "MODAL_DISMISSED",
+                      totalAmount: totalAmount,
+                      cbm: cbm,
+                    }),
+                  }).catch(() => {});
+                },
+              },
+              handler: function (response) {
+                completePaymentVerification({
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id || orderData.orderId,
+                  razorpay_signature: response.razorpay_signature || "",
+                });
+              },
+            };
+
+            const rzpInstance = new Razorpay(rzpOptions);
+            rzpInstance.on("payment.failed", function (failResponse) {
+              payBtn.disabled = false;
+              loading.classList.add("hidden");
+              const errDesc = failResponse.error?.description || "Transaction failed";
+              CS.toast("Payment failed: " + errDesc + ". Please retry.", "error");
+              alertBanner.innerHTML = "Payment failed: " + errDesc + ". Please retry.";
+              alertBanner.className = "mb-4 p-4 rounded-lg text-sm font-medium bg-red-50 text-red-900 border border-red-200 block";
+
+              fetch("/api/payment/failure", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  bookingId: currentBookingId,
+                  paymentType: paymentType,
+                  errorReason: errDesc,
+                  errorCode: failResponse.error?.code || "PAYMENT_FAILED",
+                  totalAmount: totalAmount,
+                  cbm: cbm,
+                }),
+              }).catch(() => {});
+            });
+
+            rzpInstance.open();
+            return;
+          } catch (rzpErr) {
+            console.warn("Razorpay launch error, falling back to simulator:", rzpErr);
+          }
+        }
+
+        // Fallback Simulator Modal (used if external Razorpay CDN is blocked or unavailable in offline mode)
+        document.getElementById("sim-order-id").textContent = orderData.orderId;
+        document.getElementById("sim-payment-stage").textContent = paymentType === "final" ? "Final 50% Settlement" : "Advance 50% Payment";
+        document.getElementById("sim-payable-amount").textContent = CS.formatINR(payableAmount);
+        CS.openModal("sim-razorpay-modal");
+
+        document.getElementById("sim-btn-success").onclick = () => {
+          CS.closeModal("sim-razorpay-modal");
+          completePaymentVerification({
+            razorpay_payment_id: "pay_test_" + Date.now(),
+            razorpay_order_id: orderData.orderId,
+            razorpay_signature: "sig_mock_" + Date.now(),
+          });
+        };
+
+        document.getElementById("sim-btn-fail").onclick = () => {
+          CS.closeModal("sim-razorpay-modal");
+          payBtn.disabled = false;
+          loading.classList.add("hidden");
+          CS.toast("Payment failed: Bank declined transaction. Please retry.", "error");
+          alertBanner.innerHTML = "Payment failed: Bank declined transaction. Please retry.";
+          alertBanner.className = "mb-4 p-4 rounded-lg text-sm font-medium bg-red-50 text-red-900 border border-red-200 block";
+          fetch("/api/payment/failure", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              bookingId: currentBookingId,
+              paymentType: paymentType,
+              errorReason: "Bank declined transaction",
+              errorCode: "BANK_DECLINED",
+              totalAmount: totalAmount,
+              cbm: cbm,
+            }),
+          }).catch(() => {});
+        };
+
+        document.getElementById("sim-btn-cancel").onclick = () => {
+          CS.closeModal("sim-razorpay-modal");
+          payBtn.disabled = false;
+          loading.classList.add("hidden");
+          CS.toast("Payment cancelled by user. You can retry anytime.", "warning");
+        };
+      });
     }
   </script>
 </body>

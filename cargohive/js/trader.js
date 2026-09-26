@@ -282,6 +282,90 @@
       return booking;
     },
 
+    createBookingFromPendingWithPayment(paymentInfo) {
+      paymentInfo = paymentInfo || {};
+      const pending = this.getPendingBooking();
+      const session = CS.getSession();
+      if (!pending || !session) return null;
+      const vehicle = CS.getVehicle(pending.vehicleId);
+      if (!vehicle) return null;
+
+      const settings = CS.getSettings();
+      const base = pending.cbm * vehicle.pricePerCbm;
+      const fee = Math.round(base * ((settings.serviceFeePercent || 10) / 100));
+      const total = paymentInfo.totalAmount !== undefined ? paymentInfo.totalAmount : (base + fee);
+      const advance = paymentInfo.advanceAmount !== undefined ? paymentInfo.advanceAmount : Math.round(total * 0.5);
+      const remaining = paymentInfo.remainingAmount !== undefined ? paymentInfo.remainingAmount : (total - advance);
+
+      const booking = {
+        id: pending.bookingPreviewId || CS.bookingId(),
+        traderId: session.id,
+        traderName: session.businessName || session.name,
+        providerId: vehicle.providerId,
+        providerName: vehicle.providerName,
+        vehicleId: vehicle.id,
+        vehicleNumber: vehicle.vehicleNumber,
+        route: vehicle.route,
+        cargoName: pending.cargoName,
+        cargoCategory: pending.cargoCategory,
+        cbm: pending.cbm,
+        weight: pending.weight,
+        amount: base,
+        serviceFee: fee,
+        total: total,
+        advanceAmount: advance,
+        remainingAmount: remaining,
+        amountPaid: advance,
+        pickup: pending.pickup,
+        delivery: pending.delivery,
+        pickupDate: pending.pickupDate,
+        deliveryDate: pending.deliveryDate || vehicle.etaDate,
+        status: paymentInfo.status || "Confirmed",
+        paymentStatus: paymentInfo.paymentStatus || "Advance Paid",
+        paymentMethod: paymentInfo.paymentMethod || "Razorpay",
+        txnId: paymentInfo.txnId || CS.txnId(),
+        fragile: !!pending.fragile,
+        tempControlled: !!pending.tempControlled,
+        hazardous: !!pending.hazardous,
+        createdAt: new Date().toISOString(),
+        timeline: [
+          { step: "Booking Confirmed", done: true, at: new Date().toLocaleString("en-IN") },
+          { step: "Advance Paid (50%)", done: true, at: new Date().toLocaleString("en-IN") },
+          { step: "Cargo Pickup", done: false, at: "Scheduled " + pending.pickupDate },
+          { step: "In Transit", done: false, at: "" },
+          { step: "Destination", done: false, at: "" },
+          { step: "Delivered", done: false, at: "" },
+        ],
+      };
+
+      const bookings = CS.getBookings();
+      bookings.unshift(booking);
+      CS.saveBookings(bookings);
+      CS.updateVehicleCapacity(vehicle.id, pending.cbm, pending.weight);
+
+      const notifs = CS.getNotifications();
+      notifs.trader.unshift({
+        id: CS.uid("n"),
+        title: "Advance payment received",
+        body: booking.id + " advance of ₹" + advance.toLocaleString("en-IN") + " paid via " + booking.paymentMethod + ". Booking confirmed!",
+        time: "Just now",
+        read: false,
+        type: "success",
+      });
+      notifs.provider.unshift({
+        id: CS.uid("n"),
+        title: "New booking confirmed (Advance Paid)",
+        body: session.businessName + " booked " + pending.cbm + " CBM on " + vehicle.vehicleNumber + ". Advance payment received.",
+        time: "Just now",
+        read: false,
+      });
+      CS.saveNotifications(notifs);
+
+      localStorage.setItem(draftKey("lastBooking"), JSON.stringify(booking));
+      this.clearPendingBooking();
+      return booking;
+    },
+
     getLastBooking() {
       try {
         return JSON.parse(localStorage.getItem(draftKey("lastBooking")) || "null");

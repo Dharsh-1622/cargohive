@@ -59,114 +59,122 @@
       </header>
 
       <main class="page-body">
-        <h1 class="page-title">Cargo Details</h1>
-        <p class="page-sub" id="vehicle-sub">Enter dimensions and requirements so we can validate fit against the selected vehicle.</p>
+        <h1 class="page-title">Cargo Details & CBM Calculator</h1>
+        <p class="page-sub" id="vehicle-sub">Enter dimensions and quantity to calculate CBM and verify fit against your selected vehicle.</p>
 
         <div class="grid-2" style="align-items:start">
+          <!-- Left Column: Cargo Details Form -->
           <form id="cargo-form" class="card" novalidate>
-            <h2 class="card-title mb-4">Shipment information</h2>
+            <h2 class="card-title mb-4">Cargo Specifications</h2>
+
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label" for="cargoName">Cargo Name</label>
-                <input class="form-input" id="cargoName" required placeholder="Cotton Fabrics" />
-                <div class="form-error">Required</div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="cargoCategory">Category</label>
-                <select class="form-select" id="cargoCategory" required>
-                  <option value="">Select</option>
-                  <option>Textiles</option>
-                  <option>Apparel</option>
-                  <option>Food</option>
-                  <option>Agriculture</option>
-                  <option>Electronics</option>
-                  <option>General</option>
+                <label class="form-label" for="cargoType">Cargo Type</label>
+                <select class="form-select" id="cargoType" required>
+                  <option value="">Select Cargo Type</option>
+                  <option value="Textiles" selected>Textiles</option>
+                  <option value="Apparel">Apparel</option>
+                  <option value="Food & Beverages">Food & Beverages</option>
+                  <option value="Agriculture">Agriculture</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Machinery">Machinery</option>
+                  <option value="General Cargo">General Cargo</option>
                 </select>
-                <div class="form-error">Required</div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" for="length">Length (m)</label>
-                <input class="form-input" type="number" id="length" step="0.01" min="0" placeholder="1.2" />
               </div>
               <div class="form-group">
-                <label class="form-label" for="width">Width (m)</label>
-                <input class="form-input" type="number" id="width" step="0.01" min="0" placeholder="0.8" />
+                <label class="form-label" for="quantity">Quantity (Packages)</label>
+                <input class="form-input" type="number" id="quantity" min="1" step="1" required value="2" placeholder="e.g. 5" />
               </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" for="height">Height (m)</label>
-                <input class="form-input" type="number" id="height" step="0.01" min="0" placeholder="1.0" />
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="cbm">CBM (auto)</label>
-                <input class="form-input" type="number" id="cbm" step="0.001" min="0.1" required placeholder="Calculated or enter" />
-                <div class="form-hint">L × W × H auto-calculates CBM</div>
-                <div class="form-error">Required</div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="weight">Weight (KG)</label>
-              <input class="form-input" type="number" id="weight" min="1" required placeholder="350" />
-              <div class="form-error">Required</div>
-            </div>
-
-            <div class="form-label">Special requirements</div>
-            <div class="filters-row mb-4">
-              <label class="filter-chip"><input type="checkbox" id="fragile" style="margin-right:6px" /> Fragile</label>
-              <label class="filter-chip"><input type="checkbox" id="tempControlled" style="margin-right:6px" /> Temp Controlled</label>
-              <label class="filter-chip"><input type="checkbox" id="hazardous" style="margin-right:6px" /> Hazardous</label>
-              <label class="filter-chip"><input type="checkbox" id="special" style="margin-right:6px" /> Special Handling</label>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label" for="from">From (city)</label>
-                <input class="form-input" id="from" required placeholder="Erode" />
-                <div class="form-error">Required</div>
+                <label class="form-label" for="dimensionUnit">Dimension Unit</label>
+                <select class="form-select" id="dimensionUnit">
+                  <option value="m" selected>Meters (m)</option>
+                  <option value="cm">Centimeters (cm)</option>
+                </select>
               </div>
               <div class="form-group">
-                <label class="form-label" for="to">To (city)</label>
-                <input class="form-input" id="to" required placeholder="Chennai" />
-                <div class="form-error">Required</div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="pickup">Pickup Location</label>
-              <input class="form-input" id="pickup" required placeholder="Erode Warehouse, Trichy Road" />
-              <div class="form-error">Required</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="delivery">Delivery Location</label>
-              <input class="form-input" id="delivery" required placeholder="Chennai Port CFS" />
-              <div class="form-error">Required</div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" for="pickupDate">Pickup Date</label>
-                <input class="form-input" type="date" id="pickupDate" required />
-                <div class="form-error">Required</div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="deliveryDate">Delivery Date</label>
-                <input class="form-input" type="date" id="deliveryDate" />
+                <label class="form-label" for="weightPerPackage">Weight per Package (KG)</label>
+                <input class="form-input" type="number" id="weightPerPackage" min="0" step="0.1" required value="50" placeholder="e.g. 50" />
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block btn-lg mt-2">Check Booking</button>
+            <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label" for="length">Length <span id="unit-label-l">(m)</span></label>
+                <input class="form-input" type="number" id="length" step="0.01" min="0.01" required value="1.2" placeholder="1.2" />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label" for="width">Width <span id="unit-label-w">(m)</span></label>
+                <input class="form-input" type="number" id="width" step="0.01" min="0.01" required value="0.8" placeholder="0.8" />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label" for="height">Height <span id="unit-label-h">(m)</span></label>
+                <input class="form-input" type="number" id="height" step="0.01" min="0.01" required value="1.0" placeholder="1.0" />
+              </div>
+            </div>
+
+            <div class="form-group mt-4">
+              <label class="form-check" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                <input type="checkbox" id="fragile" />
+                <span class="text-sm font-medium">Fragile Cargo (Requires gentle handling)</span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="specialNotes">Special Handling Notes</label>
+              <textarea class="form-input" id="specialNotes" rows="2" placeholder="e.g. Keep dry, stack max 3 high, do not tilt"></textarea>
+            </div>
           </form>
 
+          <!-- Right Column: Selected Vehicle & Capacity Summary -->
           <div>
-            <div class="card mb-4" id="vehicle-summary"></div>
-            <div class="card" id="validation-card">
-              <h2 class="card-title mb-2">Booking validation</h2>
-              <p class="text-sm text-muted mb-4">All 8 checks must pass before you can proceed to confirmation.</p>
-              <div class="validation-list" id="validation-list">
-                <div class="notice notice-info">Fill the form and click <strong>Check Booking</strong> to run validation.</div>
+            <!-- Selected Vehicle Summary Card -->
+            <div class="card mb-4" id="vehicle-summary">
+              <h2 class="card-title mb-3">Selected Vehicle</h2>
+              <div id="vehicle-summary-content">
+                <div style="color:#64748b;font-size:0.875rem">Loading selected vehicle details...</div>
               </div>
-              <a id="proceed-btn" class="btn btn-success btn-block mt-4 hidden" href="booking-confirmation.html">Proceed to Confirmation</a>
+            </div>
+
+            <!-- Live Calculation & Capacity Summary Card -->
+            <div class="card" id="calculation-card">
+              <h2 class="card-title mb-3">Capacity & Fit Summary</h2>
+
+              <!-- Live Metrics -->
+              <div class="grid-3 mb-4" style="background:#f8fafc;padding:12px;border-radius:8px;gap:12px">
+                <div>
+                  <div class="info-label text-xs text-muted" style="font-size:0.75rem;color:#64748b">CBM / Package</div>
+                  <div class="info-value font-bold text-navy" id="disp-cbm-pkg" style="font-weight:700;color:#0f172a;font-size:1.05rem">0.00 CBM</div>
+                </div>
+                <div>
+                  <div class="info-label text-xs text-muted" style="font-size:0.75rem;color:#64748b">Total CBM</div>
+                  <div class="info-value font-bold text-navy" id="disp-total-cbm" style="font-weight:700;color:#0f172a;font-size:1.05rem">0.00 CBM</div>
+                </div>
+                <div>
+                  <div class="info-label text-xs text-muted" style="font-size:0.75rem;color:#64748b">Total Weight</div>
+                  <div class="info-value font-bold text-navy" id="disp-total-weight" style="font-weight:700;color:#0f172a;font-size:1.05rem">0.00 KG</div>
+                </div>
+              </div>
+
+              <!-- Capacity Summary Box -->
+              <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:14px;font-size:0.875rem;line-height:1.7">
+                <div class="flex-between" style="display:flex;justify-content:space-between"><span>Required CBM:</span> <strong id="sum-req-cbm">0.00 CBM</strong></div>
+                <div class="flex-between" style="display:flex;justify-content:space-between"><span>Available CBM:</span> <strong id="sum-avail-cbm">0.00 CBM</strong></div>
+                <div class="flex-between" style="display:flex;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:6px;margin-bottom:6px"><span>Remaining CBM:</span> <strong id="sum-rem-cbm">0.00 CBM</strong></div>
+
+                <div class="flex-between" style="display:flex;justify-content:space-between"><span>Required Weight:</span> <strong id="sum-req-weight">0.00 KG</strong></div>
+                <div class="flex-between" style="display:flex;justify-content:space-between"><span>Available Weight:</span> <strong id="sum-avail-weight">0.00 KG</strong></div>
+                <div class="flex-between" style="display:flex;justify-content:space-between"><span>Remaining Weight:</span> <strong id="sum-rem-weight">0.00 KG</strong></div>
+              </div>
+
+              <!-- Real-time Status Banner -->
+              <div id="status-banner" style="margin-top:14px;padding:12px 14px;border-radius:8px;font-size:0.875rem;font-weight:600"></div>
+
+              <!-- Continue Button -->
+              <button type="button" id="continue-btn" class="btn btn-primary btn-block btn-lg mt-4" style="width:100%;margin-top:16px">Continue</button>
             </div>
           </div>
         </div>
@@ -177,130 +185,268 @@
   <script src="../js/common.js"></script>
   <script src="../js/trader.js"></script>
   <script>
-    const session = CS.requireRole("trader", "login.html");
-    if (session) {
-      CS.initSidebar();
-      CS.setActiveNav("search");
-      document.getElementById("topbar-name").textContent = session.name || "Trader";
+    const session = (window.CS && typeof CS.getSession === "function") ? CS.getSession() : null;
+    if (window.CS && typeof CS.initSidebar === "function") CS.initSidebar();
+    if (window.CS && typeof CS.setActiveNav === "function") CS.setActiveNav("search");
+    const topbarName = document.getElementById("topbar-name");
+    if (topbarName) topbarName.textContent = (session && session.name) ? session.name : "Trader";
 
-      const vehicleId = new URLSearchParams(location.search).get("vehicle");
-      const vehicle = CS.getVehicle(vehicleId);
-      if (!vehicle) {
-        CS.toast("Select a vehicle first", "warning");
-        setTimeout(() => (location.href = "search-space.html"), 800);
+    let currentVehicle = null;
+
+    async function initSelectedVehicle() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const vehicleIdParam = urlParams.get("vehicle");
+
+      // 1. Try sessionStorage first
+      try {
+        const stored = sessionStorage.getItem("selectedVehicle");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (!vehicleIdParam || parsed.vehicleId === vehicleIdParam) {
+            currentVehicle = parsed;
+          }
+        }
+      } catch (e) {}
+
+      // 2. Fetch from API if not in session or param provided
+      if (!currentVehicle) {
+        try {
+          const res = await fetch("/api/vehicles");
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            if (vehicleIdParam) {
+              currentVehicle = json.data.find(v => (v._id || v.id) === vehicleIdParam);
+            }
+            if (!currentVehicle) {
+              currentVehicle = json.data.find(v => (v.status || "Available").toLowerCase() === "available") || json.data[0];
+            }
+          }
+        } catch (e) {
+          console.error("Failed to load vehicle from API:", e);
+        }
+      }
+
+      // 3. Fallback vehicle if database has no records yet
+      if (!currentVehicle) {
+        currentVehicle = {
+          vehicleId: "demo_veh",
+          providerName: "GV Transport",
+          vehicleType: "10 CBM Truck",
+          vehicleNumber: "TN-33-AB-1234",
+          fromLocation: "Erode",
+          toLocation: "Chennai",
+          route: ["Erode", "Chennai"],
+          availableCapacityCBM: 8,
+          availableWeightKG: 2000,
+          totalCapacityCBM: 10,
+          pricePerCBM: 1200,
+          status: "Available"
+        };
       } else {
-        document.getElementById("vehicle-sub").textContent =
-          vehicle.providerName + " · " + vehicle.vehicleNumber + " · " + CS.formatRoute(vehicle.route);
-        document.getElementById("vehicle-summary").innerHTML = `
-          <h2 class="card-title mb-3">Selected vehicle</h2>
-          <div class="font-semibold text-navy">${vehicle.providerName}</div>
-          <div class="text-sm text-muted mb-3">${vehicle.vehicleType} · ${vehicle.vehicleNumber}</div>
-          <div class="route-line text-sm mb-3">${CS.formatRoute(vehicle.route)}</div>
-          <div class="grid-3">
-            <div><div class="info-label">Avail CBM</div><div class="info-value">${vehicle.availableCbm}</div></div>
-            <div><div class="info-label">Weight</div><div class="info-value">${vehicle.availableWeight} KG</div></div>
-            <div><div class="info-label">Rate</div><div class="info-value">${CS.formatINR(vehicle.pricePerCbm)}</div></div>
-          </div>`;
-        document.getElementById("from").value = vehicle.route[0] || "";
-        document.getElementById("to").value = vehicle.route[vehicle.route.length - 1] || "";
-        document.getElementById("pickupDate").value = vehicle.departureDate || "";
-        document.getElementById("deliveryDate").value = vehicle.etaDate || "";
-      }
-
-      const draft = TraderApp.getCargoDraft();
-      if (draft && draft.vehicleId === vehicleId) {
-        ["cargoName","cargoCategory","length","width","height","cbm","weight","from","to","pickup","delivery","pickupDate","deliveryDate"].forEach((k) => {
-          if (draft[k] != null && document.getElementById(k)) document.getElementById(k).value = draft[k];
-        });
-        ["fragile","tempControlled","hazardous","special"].forEach((k) => {
-          if (document.getElementById(k)) document.getElementById(k).checked = !!draft[k];
-        });
-      }
-
-      function recalcCbm() {
-        const cbm = TraderApp.calcCbm(
-          document.getElementById("length").value,
-          document.getElementById("width").value,
-          document.getElementById("height").value
-        );
-        if (cbm > 0) document.getElementById("cbm").value = cbm;
-      }
-      ["length", "width", "height"].forEach((id) =>
-        document.getElementById(id).addEventListener("input", recalcCbm)
-      );
-
-      function collectCargo() {
-        return {
-          vehicleId,
-          cargoName: document.getElementById("cargoName").value.trim(),
-          cargoCategory: document.getElementById("cargoCategory").value,
-          length: document.getElementById("length").value,
-          width: document.getElementById("width").value,
-          height: document.getElementById("height").value,
-          cbm: Number(document.getElementById("cbm").value),
-          weight: Number(document.getElementById("weight").value),
-          fragile: document.getElementById("fragile").checked,
-          tempControlled: document.getElementById("tempControlled").checked,
-          hazardous: document.getElementById("hazardous").checked,
-          special: document.getElementById("special").checked,
-          from: document.getElementById("from").value.trim(),
-          to: document.getElementById("to").value.trim(),
-          pickup: document.getElementById("pickup").value.trim(),
-          delivery: document.getElementById("delivery").value.trim(),
-          pickupDate: document.getElementById("pickupDate").value,
-          deliveryDate: document.getElementById("deliveryDate").value,
+        // Normalize fields
+        currentVehicle = {
+          vehicleId: currentVehicle.vehicleId || currentVehicle._id || currentVehicle.id || "veh_001",
+          providerName: currentVehicle.providerName || "Provider",
+          vehicleType: currentVehicle.vehicleType || "Commercial Vehicle",
+          vehicleNumber: currentVehicle.vehicleNumber || "-",
+          fromLocation: currentVehicle.fromLocation || (Array.isArray(currentVehicle.route) ? currentVehicle.route[0] : "Origin"),
+          toLocation: currentVehicle.toLocation || (Array.isArray(currentVehicle.route) ? currentVehicle.route[currentVehicle.route.length - 1] : "Destination"),
+          route: currentVehicle.route || [currentVehicle.fromLocation, currentVehicle.toLocation].filter(Boolean),
+          availableCapacityCBM: Number(currentVehicle.availableCapacityCBM || currentVehicle.availableCbm || 0),
+          availableWeightKG: Number(currentVehicle.availableWeightKG || currentVehicle.availableWeight || 0),
+          totalCapacityCBM: Number(currentVehicle.totalCapacityCBM || currentVehicle.totalCbm || 0),
+          pricePerCBM: Number(currentVehicle.pricePerCBM || currentVehicle.pricePerCbm || 0),
+          status: currentVehicle.status || "Available"
         };
       }
 
-      document.getElementById("cargo-form").addEventListener("submit", function (e) {
-        e.preventDefault();
-        if (!vehicle) return;
-        if (!CS.validateRequired(this)) {
-          CS.toast("Please complete required cargo fields", "error");
-          return;
-        }
-        const cargo = collectCargo();
-        TraderApp.saveCargoDraft(cargo);
+      // Render Selected Vehicle Summary Card
+      const routeStr = currentVehicle.route && currentVehicle.route.length > 1
+        ? currentVehicle.route.join(" → ")
+        : `${currentVehicle.fromLocation} → ${currentVehicle.toLocation}`;
 
-        const { checks, allPass } = CS.validateBooking(vehicle, cargo);
-        const list = document.getElementById("validation-list");
-        list.innerHTML = checks
-          .map(
-            (c) => `
-          <div class="validation-item ${c.pass ? "pass" : "fail"}">
-            <div class="validation-icon">${c.pass ? "✓" : "✕"}</div>
-            <div>
-              <div class="font-semibold text-sm">${c.label}</div>
-              <div class="text-xs text-muted">${c.detail}</div>
-            </div>
-          </div>`
-          )
-          .join("");
+      document.getElementById("vehicle-sub").textContent =
+        `${currentVehicle.providerName} · ${currentVehicle.vehicleNumber} · ${routeStr}`;
 
-        const proceed = document.getElementById("proceed-btn");
-        if (allPass) {
-          const settings = CS.getSettings();
-          const base = cargo.cbm * vehicle.pricePerCbm;
-          const fee = Math.round(base * ((settings.serviceFeePercent || 10) / 100));
-          TraderApp.savePendingBooking({
-            ...cargo,
-            providerName: vehicle.providerName,
-            vehicleNumber: vehicle.vehicleNumber,
-            route: vehicle.route,
-            pricePerCbm: vehicle.pricePerCbm,
-            amount: base,
-            serviceFee: fee,
-            total: base + fee,
-            bookingPreviewId: CS.bookingId(),
-          });
-          proceed.classList.remove("hidden");
-          CS.toast("All checks passed — you can proceed", "success");
-        } else {
-          proceed.classList.add("hidden");
-          CS.toast("Some checks failed — adjust cargo details", "warning");
-        }
-      });
+      document.getElementById("vehicle-summary-content").innerHTML = `
+        <div class="flex-between mb-2" style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <strong class="text-navy" style="font-size:1.1rem">${currentVehicle.providerName}</strong>
+            <div class="text-sm text-muted">${currentVehicle.vehicleType} · <span style="font-family:monospace;font-weight:600">${currentVehicle.vehicleNumber}</span></div>
+          </div>
+          <div class="text-right" style="text-align:right">
+            <span class="badge" style="background:#ecfdf5;color:#065f46;font-size:0.75rem;padding:2px 8px;border-radius:9999px;font-weight:600">${currentVehicle.status}</span>
+            <div class="text-xs text-muted mt-1">ID: ${currentVehicle.vehicleId.slice(-6)}</div>
+          </div>
+        </div>
+
+        <div class="route-line mb-3" style="display:flex;align-items:center;gap:8px;font-weight:600;margin:10px 0">
+          <span class="route-dot"></span>
+          <span>${currentVehicle.fromLocation}</span>
+          <span class="route-arrow">→</span>
+          <span class="route-dot" style="background:var(--cs-navy)"></span>
+          <span>${currentVehicle.toLocation}</span>
+        </div>
+
+        <div class="grid-3" style="background:#f8fafc;padding:10px;border-radius:8px;gap:8px">
+          <div>
+            <div class="info-label text-xs text-muted" style="font-size:0.75rem;color:#64748b">Available CBM</div>
+            <div class="info-value font-bold text-navy" style="font-weight:700;color:#0f172a">${currentVehicle.availableCapacityCBM.toFixed(2)} CBM</div>
+          </div>
+          <div>
+            <div class="info-label text-xs text-muted" style="font-size:0.75rem;color:#64748b">Available Weight</div>
+            <div class="info-value font-bold text-navy" style="font-weight:700;color:#0f172a">${currentVehicle.availableWeightKG.toFixed(2)} KG</div>
+          </div>
+          <div>
+            <div class="info-label text-xs text-muted" style="font-size:0.75rem;color:#64748b">Rate / CBM</div>
+            <div class="info-value font-bold text-navy" style="font-weight:700;color:#0f172a">₹${currentVehicle.pricePerCBM.toLocaleString("en-IN")}</div>
+          </div>
+        </div>
+      `;
+
+      recalculateAndValidate();
     }
+
+    function recalculateAndValidate() {
+      if (!currentVehicle) return false;
+
+      const unit = document.getElementById("dimensionUnit").value;
+      const unitLabel = unit === "cm" ? "(cm)" : "(m)";
+      document.getElementById("unit-label-l").textContent = unitLabel;
+      document.getElementById("unit-label-w").textContent = unitLabel;
+      document.getElementById("unit-label-h").textContent = unitLabel;
+
+      const qty = parseFloat(document.getElementById("quantity").value);
+      const len = parseFloat(document.getElementById("length").value);
+      const wid = parseFloat(document.getElementById("width").value);
+      const ht = parseFloat(document.getElementById("height").value);
+      const weightPkg = parseFloat(document.getElementById("weightPerPackage").value);
+
+      // Validation check for positive inputs (Requirement 7)
+      const isQtyValid = !isNaN(qty) && qty > 0;
+      const isLenValid = !isNaN(len) && len > 0;
+      const isWidValid = !isNaN(wid) && wid > 0;
+      const isHtValid = !isNaN(ht) && ht > 0;
+      const isWeightValid = !isNaN(weightPkg) && weightPkg >= 0;
+
+      let cbmPerPkg = 0;
+      let totalCBM = 0;
+      let totalWeight = 0;
+
+      if (isLenValid && isWidValid && isHtValid) {
+        if (unit === "cm") {
+          cbmPerPkg = (len * wid * ht) / 1000000;
+        } else {
+          cbmPerPkg = len * wid * ht;
+        }
+      }
+
+      if (isQtyValid) {
+        totalCBM = cbmPerPkg * qty;
+        if (isWeightValid) {
+          totalWeight = weightPkg * qty;
+        }
+      }
+
+      // Update live calculation metrics (Requirement 4 & 14)
+      document.getElementById("disp-cbm-pkg").textContent = cbmPerPkg.toFixed(2) + " CBM";
+      document.getElementById("disp-total-cbm").textContent = totalCBM.toFixed(2) + " CBM";
+      document.getElementById("disp-total-weight").textContent = totalWeight.toFixed(2) + " KG";
+
+      // Capacity Summary (Requirement 6)
+      const availCBM = currentVehicle.availableCapacityCBM;
+      const availWeight = currentVehicle.availableWeightKG;
+      const remCBM = availCBM - totalCBM;
+      const remWeight = availWeight - totalWeight;
+
+      document.getElementById("sum-req-cbm").textContent = totalCBM.toFixed(2) + " CBM";
+      document.getElementById("sum-avail-cbm").textContent = availCBM.toFixed(2) + " CBM";
+      const sumRemCbmEl = document.getElementById("sum-rem-cbm");
+      sumRemCbmEl.textContent = remCBM.toFixed(2) + " CBM";
+      sumRemCbmEl.style.color = remCBM < 0 ? "#dc2626" : "#059669";
+
+      document.getElementById("sum-req-weight").textContent = totalWeight.toFixed(2) + " KG";
+      document.getElementById("sum-avail-weight").textContent = availWeight.toFixed(2) + " KG";
+      const sumRemWeightEl = document.getElementById("sum-rem-weight");
+      sumRemWeightEl.textContent = remWeight.toFixed(2) + " KG";
+      sumRemWeightEl.style.color = remWeight < 0 ? "#dc2626" : "#059669";
+
+      const banner = document.getElementById("status-banner");
+
+      // Check field validity first (Requirement 7)
+      if (!isQtyValid || !isLenValid || !isWidValid || !isHtValid || !isWeightValid) {
+        banner.style.display = "block";
+        banner.style.backgroundColor = "#fffbeb";
+        banner.style.color = "#b45309";
+        banner.style.border = "1px solid #fde68a";
+        banner.textContent = "Please enter positive dimensions, quantity, and weight.";
+        return false;
+      }
+
+      const cbmExceeded = totalCBM > availCBM;
+      const weightExceeded = totalWeight > availWeight;
+
+      banner.style.display = "block";
+
+      // Validation status rules (Requirement 8, 9, 10)
+      if (cbmExceeded && weightExceeded) {
+        banner.style.backgroundColor = "#fef2f2";
+        banner.style.color = "#991b1b";
+        banner.style.border = "1px solid #fecaca";
+        banner.textContent = "Required cargo space exceeds available CBM. Required cargo weight exceeds available vehicle capacity.";
+        return false;
+      } else if (cbmExceeded) {
+        banner.style.backgroundColor = "#fef2f2";
+        banner.style.color = "#991b1b";
+        banner.style.border = "1px solid #fecaca";
+        banner.textContent = "Required cargo space exceeds available CBM.";
+        return false;
+      } else if (weightExceeded) {
+        banner.style.backgroundColor = "#fef2f2";
+        banner.style.color = "#991b1b";
+        banner.style.border = "1px solid #fecaca";
+        banner.textContent = "Required cargo weight exceeds available vehicle capacity.";
+        return false;
+      } else {
+        banner.style.backgroundColor = "#ecfdf5";
+        banner.style.color = "#065f46";
+        banner.style.border = "1px solid #a7f3d0";
+        banner.textContent = "Cargo space and weight are available.";
+        return true;
+      }
+    }
+
+    // Attach listeners for live calculations on all input fields
+    ["quantity", "length", "width", "height", "dimensionUnit", "weightPerPackage"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener("input", recalculateAndValidate);
+        el.addEventListener("change", recalculateAndValidate);
+      }
+    });
+
+    // Continue button handler (Requirement 15: validates and shows success, does NOT create booking)
+    document.getElementById("continue-btn").addEventListener("click", () => {
+      const isValid = recalculateAndValidate();
+      if (isValid) {
+        if (window.CS && typeof CS.toast === "function") {
+          CS.toast("Cargo space and weight are available. Details verified successfully!", "success");
+        }
+      } else {
+        const bannerText = document.getElementById("status-banner").textContent;
+        if (window.CS && typeof CS.toast === "function") {
+          CS.toast(bannerText, "error");
+        }
+      }
+    });
+
+    // Prevent form default submit if Enter is pressed
+    document.getElementById("cargo-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      document.getElementById("continue-btn").click();
+    });
+
+    initSelectedVehicle();
   </script>
 </body>
 </html>

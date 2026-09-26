@@ -123,91 +123,279 @@
   <script src="../js/common.js"></script>
   <script src="../js/trader.js"></script>
   <script>
-    const session = CS.requireRole("trader", "login.html");
-    if (session) {
-      CS.initSidebar();
-      CS.setActiveNav("search");
-      document.getElementById("topbar-name").textContent = session.name || "Trader";
+    // Safe session check
+    const session = (window.CS && typeof CS.getSession === "function") ? CS.getSession() : null;
+    if (window.CS && typeof CS.initSidebar === "function") CS.initSidebar();
+    if (window.CS && typeof CS.setActiveNav === "function") CS.setActiveNav("search");
+    const topbarName = document.getElementById("topbar-name");
+    if (topbarName) topbarName.textContent = (session && session.name) ? session.name : "Trader";
 
-      const filters = { vehicleType: "All", verifiedOnly: false, temp: false, fragile: false };
+    const API_URL = (window.location.hostname === "localhost" && window.location.port === "5000")
+      ? "/api/vehicles"
+      : "http://localhost:5000/api/vehicles";
 
-      document.querySelectorAll("#filter-chips .filter-chip").forEach((chip) => {
-        chip.addEventListener("click", () => {
-          const key = chip.dataset.filter;
-          const val = chip.dataset.value;
-          if (key === "vehicleType") {
-            document.querySelectorAll('[data-filter="vehicleType"]').forEach((c) => c.classList.remove("active"));
-            chip.classList.add("active");
-            filters.vehicleType = val;
-          } else {
-            chip.classList.toggle("active");
-            filters[key] = chip.classList.contains("active");
-          }
-          runSearch();
-        });
-      });
-      document.querySelector('[data-value="All"]').classList.add("active");
+    let allVehicles = [];
+    const activeFilters = { vehicleType: "All" };
 
-      function runSearch() {
-        const results = TraderApp.searchVehicles({
-          from: document.getElementById("from").value.trim(),
-          to: document.getElementById("to").value.trim(),
-          cbm: document.getElementById("cbm").value,
-          weight: document.getElementById("weight").value,
-          maxPrice: document.getElementById("maxPrice").value,
-          vehicleType: filters.vehicleType,
-          verifiedOnly: filters.verifiedOnly,
-          temp: filters.temp,
-          fragile: filters.fragile,
-        });
-        const el = document.getElementById("results");
-        document.getElementById("results-count").textContent = results.length + " result" + (results.length === 1 ? "" : "s");
-        if (!results.length) {
-          el.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🚛</div><p>No vehicles match your filters. Try Erode → Chennai or clear filters.</p></div>';
-          return;
+    // Setup filter chips
+    document.querySelectorAll("#filter-chips .filter-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const key = chip.dataset.filter;
+        const val = chip.dataset.value;
+        if (key === "vehicleType") {
+          document.querySelectorAll('[data-filter="vehicleType"]').forEach((c) => c.classList.remove("active"));
+          chip.classList.add("active");
+          activeFilters.vehicleType = val;
+        } else {
+          chip.classList.toggle("active");
+          activeFilters[key] = chip.classList.contains("active");
         }
-        el.innerHTML = results.map((v) => TraderApp.vehicleCardHTML(v)).join("");
+        applyFilters();
+      });
+    });
+
+    const defaultChip = document.querySelector('[data-value="All"]');
+    if (defaultChip) defaultChip.classList.add("active");
+
+    function renderVehicleCard(v) {
+      const providerName = v.providerName || "Provider";
+      const vehicleType = v.vehicleType || "Commercial Vehicle";
+      const vehicleNumber = v.vehicleNumber || "-";
+      const fromLocation = v.fromLocation || "-";
+      const toLocation = v.toLocation || "-";
+      const pickupDate = v.pickupDate || "-";
+      const departureTime = v.departureTime ? v.departureTime : "Flexible";
+      const totalCapacity = Number(v.totalCapacityCBM || 0);
+      const availableCapacity = Number(v.availableCapacityCBM || 0);
+      const availableWeight = Number(v.availableWeightKG || 0);
+      const pricePerCBM = (v.pricePerCBM !== undefined && v.pricePerCBM !== null && v.pricePerCBM !== "") 
+        ? "₹" + Number(v.pricePerCBM).toLocaleString("en-IN") 
+        : "₹0";
+      const status = v.status || "Available";
+
+      // Capacity bar percentage
+      const occupied = Math.max(0, totalCapacity - availableCapacity);
+      const pct = totalCapacity > 0 ? Math.min(100, Math.round((occupied / totalCapacity) * 100)) : 0;
+
+      return `
+        <div class="vehicle-card">
+          <div class="flex-between mb-3">
+            <div>
+              <div class="flex-center gap-2" style="display:flex;align-items:center;gap:8px">
+                <strong class="text-navy" style="font-size:1.05rem">${providerName}</strong>
+                <span class="badge" style="background:#ecfdf5;color:#065f46;font-size:0.75rem;padding:2px 8px;border-radius:9999px;font-weight:600">${status}</span>
+              </div>
+              <div class="text-sm text-muted mt-1">${vehicleType} · <span style="font-family:monospace;font-weight:600">${vehicleNumber}</span></div>
+            </div>
+            <div class="text-right" style="text-align:right">
+              <div class="price-tag" style="font-size:1.25rem;font-weight:700;color:var(--cs-blue)">${pricePerCBM}</div>
+              <div class="text-xs text-muted">/ CBM</div>
+            </div>
+          </div>
+
+          <div class="route-line mb-3">
+            <span class="route-dot"></span>
+            <span>${fromLocation}</span>
+            <span class="route-arrow">→</span>
+            <span class="route-dot" style="background:var(--cs-navy)"></span>
+            <span>${toLocation}</span>
+          </div>
+
+          <div class="grid-3 mb-3" style="gap:10px;background:#f8fafc;padding:10px 12px;border-radius:8px">
+            <div>
+              <div class="info-label" style="font-size:0.75rem;color:#64748b">Available CBM</div>
+              <div class="info-value" style="font-weight:700;color:#0f172a">${availableCapacity} CBM</div>
+            </div>
+            <div>
+              <div class="info-label" style="font-size:0.75rem;color:#64748b">Available Weight</div>
+              <div class="info-value" style="font-weight:700;color:#0f172a">${availableWeight} KG</div>
+            </div>
+            <div>
+              <div class="info-label" style="font-size:0.75rem;color:#64748b">Total Capacity</div>
+              <div class="info-value" style="font-weight:700;color:#0f172a">${totalCapacity} CBM</div>
+            </div>
+          </div>
+
+          <div class="capacity-bar mb-2"><div class="capacity-filled" style="width:${pct}%"></div></div>
+
+          <div class="flex-between text-xs text-muted" style="display:flex;justify-content:space-between;padding-top:6px;border-top:1px solid #f1f5f9">
+            <span><strong>Pickup Date:</strong> ${pickupDate}</span>
+            <span><strong>Departure:</strong> ${departureTime}</span>
+          </div>
+
+          <div style="margin-top:10px;padding-top:8px;border-top:1px solid #f1f5f9">
+            <a class="btn btn-primary btn-sm btn-block select-vehicle-link" style="display:block;text-align:center;text-decoration:none" href="cargo-details.html?vehicle=${v._id || v.id}">
+              Select Space & Calculate CBM →
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    // Attach click handler for storing selected vehicle in sessionStorage
+    document.getElementById("results").addEventListener("click", (e) => {
+      const link = e.target.closest(".select-vehicle-link");
+      if (link) {
+        const url = new URL(link.href, window.location.origin);
+        const vId = url.searchParams.get("vehicle");
+        const found = allVehicles.find((x) => (x._id || x.id) === vId);
+        if (found) {
+          sessionStorage.setItem("selectedVehicle", JSON.stringify({
+            vehicleId: found._id || found.id,
+            availableCapacityCBM: Number(found.availableCapacityCBM || 0),
+            availableWeightKG: Number(found.availableWeightKG || 0),
+            totalCapacityCBM: Number(found.totalCapacityCBM || 0),
+            providerName: found.providerName || "Provider",
+            vehicleType: found.vehicleType || "Commercial Vehicle",
+            vehicleNumber: found.vehicleNumber || "-",
+            fromLocation: found.fromLocation || "-",
+            toLocation: found.toLocation || "-",
+            route: [found.fromLocation, found.toLocation].filter(Boolean),
+            pickupDate: found.pickupDate || "-",
+            departureTime: found.departureTime || "Flexible",
+            pricePerCBM: Number(found.pricePerCBM || 0),
+            status: found.status || "Available"
+          }));
+        }
+      }
+    });
+
+    function applyFilters() {
+      const fromInput = document.getElementById("from").value.trim().toLowerCase();
+      const toInput = document.getElementById("to").value.trim().toLowerCase();
+      const dateInput = document.getElementById("pickupDate") ? document.getElementById("pickupDate").value : "";
+      const cbmInput = parseFloat(document.getElementById("cbm").value);
+      const weightInput = parseFloat(document.getElementById("weight").value);
+      const maxPriceInput = parseFloat(document.getElementById("maxPrice").value);
+
+      const filtered = allVehicles.filter((v) => {
+        // Rule: Only show vehicles with status "Available"
+        const currentStatus = (v.status || "Available").trim().toLowerCase();
+        if (currentStatus !== "available") return false;
+
+        // Rule: From should match vehicle fromLocation
+        if (fromInput) {
+          const fromLoc = (v.fromLocation || "").toLowerCase();
+          if (!fromLoc.includes(fromInput)) return false;
+        }
+
+        // Rule: To should match vehicle toLocation
+        if (toInput) {
+          const toLoc = (v.toLocation || "").toLowerCase();
+          if (!toLoc.includes(toInput)) return false;
+        }
+
+        // Rule: Pickup date should match pickupDate
+        if (dateInput) {
+          if (v.pickupDate !== dateInput) return false;
+        }
+
+        // Rule: Required CBM must be <= availableCapacityCBM
+        if (!isNaN(cbmInput) && cbmInput > 0) {
+          if (cbmInput > Number(v.availableCapacityCBM || 0)) return false;
+        }
+
+        // Rule: Required weight must be <= availableWeightKG
+        if (!isNaN(weightInput) && weightInput > 0) {
+          if (weightInput > Number(v.availableWeightKG || 0)) return false;
+        }
+
+        // Max price filter (optional input present in form)
+        if (!isNaN(maxPriceInput) && maxPriceInput > 0) {
+          if (Number(v.pricePerCBM || 0) > maxPriceInput) return false;
+        }
+
+        // Vehicle type filter chip
+        if (activeFilters.vehicleType && activeFilters.vehicleType !== "All") {
+          if (v.vehicleType !== activeFilters.vehicleType) return false;
+        }
+
+        return true;
+      });
+
+      const container = document.getElementById("results");
+      const countEl = document.getElementById("results-count");
+      if (countEl) {
+        countEl.textContent = filtered.length + " space" + (filtered.length === 1 ? "" : "s") + " available";
       }
 
-      document.getElementById("search-form").addEventListener("submit", (e) => {
-        e.preventDefault();
-        runSearch();
-        CS.toast("Showing matching cargo space", "success");
-      });
-      document.getElementById("reset-btn").addEventListener("click", () => {
-        document.getElementById("search-form").reset();
-        filters.vehicleType = "All";
-        filters.verifiedOnly = false;
-        filters.temp = false;
-        filters.fragile = false;
-        document.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("active"));
-        document.querySelector('[data-value="All"]').classList.add("active");
-        runSearch();
-      });
+      if (!filtered.length) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;text-align:center;padding:48px 16px">
+            <div class="empty-state-icon" style="font-size:2.5rem;margin-bottom:12px">🚛</div>
+            <p style="font-size:1rem;color:var(--cs-slate-600);font-weight:600">No matching cargo space available.</p>
+          </div>
+        `;
+        return;
+      }
 
-      // Prefill from query params or localStorage search
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        let storedSearch = {};
-        try {
-          storedSearch = JSON.parse(localStorage.getItem("cargoHiveSearch") || "{}");
-        } catch (e) {}
-
-        const fromVal = urlParams.get("from") || storedSearch.from;
-        const toVal = urlParams.get("to") || storedSearch.to;
-        const dateVal = urlParams.get("pickupDate") || storedSearch.pickupDate;
-        const cbmVal = urlParams.get("cbm") || storedSearch.cbm;
-        const weightVal = urlParams.get("weight") || storedSearch.weight;
-
-        if (fromVal) document.getElementById("from").value = fromVal;
-        if (toVal) document.getElementById("to").value = toVal;
-        if (dateVal && document.getElementById("pickupDate")) document.getElementById("pickupDate").value = dateVal;
-        if (cbmVal) document.getElementById("cbm").value = cbmVal;
-        if (weightVal) document.getElementById("weight").value = weightVal;
-      } catch (e) {}
-
-      runSearch();
+      container.innerHTML = filtered.map(renderVehicleCard).join("");
     }
+
+    async function fetchVehicles() {
+      const container = document.getElementById("results");
+      container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#64748b">Loading cargo space from database...</div>';
+
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+
+        if (response.ok && data.success && Array.isArray(data.data)) {
+          allVehicles = data.data;
+          applyFilters();
+        } else {
+          container.innerHTML = `
+            <div class="empty-state" style="grid-column:1/-1;text-align:center;padding:48px 16px">
+              <p style="font-size:1rem;color:#dc2626;font-weight:600">Failed to load cargo space from database.</p>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error("Fetch vehicles error:", err);
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;text-align:center;padding:48px 16px">
+            <p style="font-size:1rem;color:#dc2626;font-weight:600">Could not connect to CargoHive server. Ensure backend is running on port 5000.</p>
+          </div>
+        `;
+      }
+    }
+
+    // Form submit listener
+    document.getElementById("search-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      applyFilters();
+      if (window.CS && typeof CS.toast === "function") {
+        CS.toast("Search filters applied", "info");
+      }
+    });
+
+    // Reset button listener
+    document.getElementById("reset-btn").addEventListener("click", () => {
+      document.getElementById("search-form").reset();
+      activeFilters.vehicleType = "All";
+      document.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("active"));
+      if (defaultChip) defaultChip.classList.add("active");
+      applyFilters();
+    });
+
+    // Prefill from query params if available
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const fromVal = urlParams.get("from");
+      const toVal = urlParams.get("to");
+      const dateVal = urlParams.get("pickupDate");
+      const cbmVal = urlParams.get("cbm");
+      const weightVal = urlParams.get("weight");
+
+      if (fromVal) document.getElementById("from").value = fromVal;
+      if (toVal) document.getElementById("to").value = toVal;
+      if (dateVal && document.getElementById("pickupDate")) document.getElementById("pickupDate").value = dateVal;
+      if (cbmVal) document.getElementById("cbm").value = cbmVal;
+      if (weightVal) document.getElementById("weight").value = weightVal;
+    } catch (e) {}
+
+    // Initial load
+    fetchVehicles();
   </script>
 </body>
 </html>

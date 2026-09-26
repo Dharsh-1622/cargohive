@@ -31,6 +31,7 @@
       </header>
       <main class="page-body">
         <div class="card" style="max-width:720px">
+          <div id="form-feedback" style="display:none;margin-bottom:1rem;padding:0.75rem 1rem;border-radius:0.5rem;font-size:0.875rem;"></div>
           <form id="add-form">
             <div class="form-row">
               <div class="form-group"><label class="form-label">Vehicle Number</label><input class="form-input" id="vehicleNumber" required placeholder="TN-33-XX-0000" /><div class="form-error">Required</div></div>
@@ -82,24 +83,174 @@
   <script src="../js/common.js"></script>
   <script src="../js/provider.js"></script>
   <script>
-    const session = CS.requireRole('provider', 'login.html');
-    if (session) {
-      CS.initSidebar(); CS.setActiveNav('add-vehicle');
-      document.getElementById('add-form').onsubmit = (e) => {
-        e.preventDefault();
-        if (!CS.validateRequired(e.target)) { CS.toast('Fill required fields', 'error'); return; }
-        ProviderApp.addVehicle({
-          vehicleNumber: vehicleNumber.value.trim(), vehicleType: vehicleType.value,
-          totalCbm: totalCbm.value, maxWeight: maxWeight.value,
-          start: start.value.trim(), stop1: stop1.value.trim(), stop2: stop2.value.trim(), destination: destination.value.trim(),
-          departureDate: departureDate.value, departureTime: departureTime.value,
-          etaDate: etaDate.value, etaTime: etaTime.value,
-          availableCbm: availableCbm.value, availableWeight: availableWeight.value, pricePerCbm: pricePerCbm.value,
-          tempControlled: tempControlled.checked, refrigerated: refrigerated.checked,
-          hazardousAllowed: hazardousAllowed.checked, fragileSupported: fragileSupported.checked,
-        });
-      };
+    // Get existing session if available
+    const session = (window.CS && typeof CS.getSession === 'function') ? CS.getSession() : null;
+    if (window.CS && typeof CS.initSidebar === 'function') CS.initSidebar();
+    if (window.CS && typeof CS.setActiveNav === 'function') CS.setActiveNav('add-vehicle');
+
+    function showFeedback(message, type) {
+      const box = document.getElementById('form-feedback');
+      if (!box) return;
+      box.style.display = 'block';
+      if (type === 'success') {
+        box.style.backgroundColor = '#ecfdf5';
+        box.style.color = '#065f46';
+        box.style.border = '1px solid #a7f3d0';
+        box.innerHTML = '✅ ' + message;
+      } else {
+        box.style.backgroundColor = '#fef2f2';
+        box.style.color = '#991b1b';
+        box.style.border = '1px solid #fecaca';
+        box.innerHTML = '❌ ' + message;
+      }
     }
+
+    function hideFeedback() {
+      const box = document.getElementById('form-feedback');
+      if (box) box.style.display = 'none';
+    }
+
+    const form = document.getElementById('add-form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      hideFeedback();
+
+      const vehicleNum = document.getElementById('vehicleNumber').value.trim();
+      const vType = document.getElementById('vehicleType').value;
+      const startLoc = document.getElementById('start').value.trim();
+      const destLoc = document.getElementById('destination').value.trim();
+      const depDate = document.getElementById('departureDate').value;
+      const depTime = document.getElementById('departureTime').value;
+      const totalCbmVal = document.getElementById('totalCbm').value;
+      const availCbmVal = document.getElementById('availableCbm').value;
+      const maxWeightVal = document.getElementById('maxWeight').value;
+      const availWeightVal = document.getElementById('availableWeight').value;
+      const priceVal = document.getElementById('pricePerCbm').value;
+
+      // 1. Required fields validation
+      if (!vehicleNum || !vType || !startLoc || !destLoc || !depDate ||
+          totalCbmVal === '' || availCbmVal === '' || maxWeightVal === '' || availWeightVal === '') {
+        showFeedback('Please fill in all required fields.', 'error');
+        if (window.CS && CS.toast) CS.toast('Fill in all required fields', 'error');
+        return;
+      }
+
+      const totalCBM = Number(totalCbmVal);
+      const availableCBM = Number(availCbmVal);
+      const maxWeightKG = Number(maxWeightVal);
+      const availableWeightKG = Number(availWeightVal);
+
+      if (isNaN(totalCBM) || isNaN(availableCBM) || isNaN(maxWeightKG) || isNaN(availableWeightKG)) {
+        showFeedback('Capacity and weight must be valid numbers.', 'error');
+        if (window.CS && CS.toast) CS.toast('Invalid numbers in capacity or weight', 'error');
+        return;
+      }
+
+      // 2. Numeric range validation
+      if (totalCBM <= 0) {
+        showFeedback('Total Capacity (CBM) must be greater than 0.', 'error');
+        if (window.CS && CS.toast) CS.toast('Total capacity must be > 0', 'error');
+        return;
+      }
+
+      if (availableCBM < 0) {
+        showFeedback('Available Capacity (CBM) must be greater than or equal to 0.', 'error');
+        if (window.CS && CS.toast) CS.toast('Available capacity must be >= 0', 'error');
+        return;
+      }
+
+      if (availableCBM > totalCBM) {
+        showFeedback('Available Capacity (CBM) cannot exceed Total Capacity.', 'error');
+        if (window.CS && CS.toast) CS.toast('Available CBM cannot exceed total CBM', 'error');
+        return;
+      }
+
+      if (maxWeightKG <= 0) {
+        showFeedback('Maximum Weight (KG) must be greater than 0.', 'error');
+        if (window.CS && CS.toast) CS.toast('Max weight must be > 0', 'error');
+        return;
+      }
+
+      if (availableWeightKG < 0) {
+        showFeedback('Available Weight (KG) must be greater than or equal to 0.', 'error');
+        if (window.CS && CS.toast) CS.toast('Available weight must be >= 0', 'error');
+        return;
+      }
+
+      if (availableWeightKG > maxWeightKG) {
+        showFeedback('Available Weight (KG) cannot exceed Maximum Weight.', 'error');
+        if (window.CS && CS.toast) CS.toast('Available weight cannot exceed max weight', 'error');
+        return;
+      }
+
+      const providerName = (session && (session.companyName || session.name)) || 'GV Transport';
+
+      const payload = {
+        providerName: providerName,
+        vehicleType: vType,
+        vehicleNumber: vehicleNum,
+        fromLocation: startLoc,
+        toLocation: destLoc,
+        pickupDate: depDate,
+        departureTime: depTime || '',
+        totalCapacityCBM: totalCBM,
+        availableCapacityCBM: availableCBM,
+        maxWeightKG: maxWeightKG,
+        availableWeightKG: availableWeightKG,
+        pricePerCBM: priceVal !== '' ? Number(priceVal) : undefined,
+        status: 'Available'
+      };
+
+      const API_URL = (window.location.hostname === 'localhost' && window.location.port === '5000')
+        ? '/api/vehicles'
+        : 'http://localhost:5000/api/vehicles';
+
+      submitBtn.disabled = true;
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Saving...';
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          showFeedback('Vehicle added successfully to the database!', 'success');
+          if (window.CS && CS.toast) {
+            CS.toast('Vehicle added successfully!', 'success');
+          }
+
+          // Clear the form
+          form.reset();
+          const inputsToClear = form.querySelectorAll('input:not([type=checkbox]):not([type=radio])');
+          inputsToClear.forEach(input => { input.value = ''; });
+        } else {
+          const errMsg = result.message || 'Failed to add vehicle.';
+          showFeedback(errMsg, 'error');
+          if (window.CS && CS.toast) {
+            CS.toast(errMsg, 'error');
+          }
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        const netErr = 'Could not connect to server. Please ensure the backend is running on port 5000.';
+        showFeedback(netErr, 'error');
+        if (window.CS && CS.toast) {
+          CS.toast(netErr, 'error');
+        }
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    };
   </script>
 </body>
 </html>

@@ -819,6 +819,11 @@
       Paid: "badge-success",
       Refunded: "badge-slate",
       Pending: "badge-warning",
+      "Payment Pending": "badge-warning",
+      "Advance Paid": "badge-info",
+      "Final Payment Pending": "badge-warning",
+      "Fully Paid": "badge-success",
+      Failed: "badge-danger",
       Approved: "badge-success",
       Rejected: "badge-danger",
       Suspended: "badge-danger",
@@ -1136,6 +1141,121 @@
     );
   }
 
+  /* ---------- Receipt Generator & Downloader ---------- */
+  function downloadReceipt(data) {
+    if (!data) return;
+    const bId = data.bookingId || data.id || "BK-UNKNOWN";
+    const trader = data.trader || data.traderName || "Trader";
+    const provider = data.provider || data.providerName || "Provider";
+    const route = Array.isArray(data.route) ? data.route.join(" → ") : (data.route || "—");
+    const cargo = data.cargo || data.cargoName || "General Goods";
+    const cbm = data.cbm !== undefined ? data.cbm : "—";
+    const weight = data.weight !== undefined ? data.weight : "—";
+    const totalAmount = data.totalAmount !== undefined ? data.totalAmount : (data.total || 0);
+    const amountPaid = data.amountPaid !== undefined ? data.amountPaid : (data.advanceAmount || Math.round(totalAmount * 0.5));
+    const remainingAmount = data.remainingAmount !== undefined ? data.remainingAmount : (totalAmount - amountPaid);
+    const paymentStatus = data.paymentStatus || data.status || "Advance Paid";
+    const paymentDate = data.paymentDate ? new Date(data.paymentDate).toLocaleString("en-IN") : new Date().toLocaleString("en-IN");
+    const txnId = data.transactionId || data.txnId || data.razorpayPaymentId || "—";
+    const receiptNo = data.receiptNumber || ("RCPT-" + Date.now().toString().slice(-6));
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Payment Receipt — ${bId} — CargoHive</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 30px; color: #0b1f3a; background: #f8fafc; }
+    .receipt-container { max-width: 680px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 36px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0b1f3a; padding-bottom: 20px; margin-bottom: 24px; }
+    .brand { font-size: 26px; font-weight: 800; color: #0b1f3a; display: flex; align-items: center; gap: 8px; }
+    .brand span { color: #1d4ed8; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; background: #ecfdf5; color: #065f46; text-transform: uppercase; }
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; font-size: 14px; }
+    .meta-box { background: #f1f5f9; padding: 12px 16px; border-radius: 8px; }
+    .meta-label { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; }
+    .meta-val { font-size: 15px; font-weight: 700; color: #0f172a; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px; }
+    th { text-align: left; background: #0b1f3a; color: #ffffff; padding: 10px 14px; font-weight: 600; }
+    td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; }
+    .total-section { margin-top: 10px; border-top: 2px solid #e2e8f0; padding-top: 14px; }
+    .total-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
+    .total-row.highlight { font-size: 18px; font-weight: 800; color: #1d4ed8; border-top: 1px solid #e2e8f0; padding-top: 10px; }
+    .footer { margin-top: 32px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px dashed #cbd5e1; padding-top: 16px; }
+    .btn-print { display: inline-block; margin-top: 16px; background: #1d4ed8; color: white; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; cursor: pointer; border: none; }
+    @media print { .no-print { display: none; } body { background: #fff; padding: 0; } .receipt-container { box-shadow: none; border: none; } }
+  </style>
+</head>
+<body>
+  <div class="receipt-container">
+    <div class="header">
+      <div>
+        <div class="brand">Cargo<span>Hive</span></div>
+        <div style="font-size:13px;color:#64748b;margin-top:4px">Official Payment Receipt & Bill of Lading</div>
+      </div>
+      <div style="text-align:right">
+        <span class="badge">${paymentStatus}</span>
+        <div style="font-size:12px;color:#64748b;margin-top:6px">Receipt No: <strong>${receiptNo}</strong></div>
+      </div>
+    </div>
+
+    <div class="meta-grid">
+      <div class="meta-box"><div class="meta-label">Booking ID</div><div class="meta-val">${bId}</div></div>
+      <div class="meta-box"><div class="meta-label">Payment Date</div><div class="meta-val">${paymentDate}</div></div>
+      <div class="meta-box"><div class="meta-label">Trader (Shipper)</div><div class="meta-val">${trader}</div></div>
+      <div class="meta-box"><div class="meta-label">Provider (Transporter)</div><div class="meta-val">${provider}</div></div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Cargo Details</th>
+          <th>Route Corridor</th>
+          <th>Space (CBM)</th>
+          <th>Weight (KG)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>${cargo}</strong><br/><span style="font-size:12px;color:#64748b">Txn ID: ${txnId}</span></td>
+          <td>${route}</td>
+          <td><strong>${cbm} CBM</strong></td>
+          <td>${weight} KG</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="total-section">
+      <div class="total-row"><span style="color:#64748b">Total Booking Amount:</span><strong>₹${Number(totalAmount).toLocaleString("en-IN")}</strong></div>
+      <div class="total-row"><span style="color:#059669;font-weight:600">Amount Paid (Processed):</span><strong style="color:#059669">₹${Number(amountPaid).toLocaleString("en-IN")}</strong></div>
+      <div class="total-row"><span style="color:#d97706;font-weight:600">Remaining Amount Due:</span><strong style="color:#d97706">₹${Number(remainingAmount).toLocaleString("en-IN")}</strong></div>
+      <div class="total-row highlight"><span>Current Payment Status:</span><span>${paymentStatus}</span></div>
+    </div>
+
+    <div class="footer">
+      <p>Thank you for partnering with <strong>CargoHive</strong> — Shared Cargo & Smart Freight Network.</p>
+      <p>Razorpay Test Mode Verified Receipt.</p>
+      <div class="no-print">
+        <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `CargoHive_Receipt_${bId}.html`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 200);
+  }
+
   /* ---------- Init ---------- */
   ensureSeed();
 
@@ -1189,5 +1309,6 @@
     renderSidebar,
     ICONS,
     logoHTML,
+    downloadReceipt,
   };
 })(window);

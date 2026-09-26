@@ -53,13 +53,13 @@
           </button>
           <div>
             <div class="font-semibold text-navy" id="topbar-name">Trader</div>
-            <div class="text-xs text-muted">Payment complete</div>
+            <div class="text-xs text-muted">Payment confirmation</div>
           </div>
         </div>
       </header>
 
       <main class="page-body">
-        <div class="card" style="max-width:640px;margin:0 auto;text-align:center" id="success-root">
+        <div class="card" style="max-width:660px;margin:0 auto;text-align:center" id="success-root">
           <div class="empty-state"><div class="loading-spinner"></div></div>
         </div>
       </main>
@@ -75,29 +75,108 @@
       CS.setActiveNav("bookings");
       document.getElementById("topbar-name").textContent = session.name || "Trader";
 
-      const b = TraderApp.getLastBooking();
+      // Read receipt from localStorage or last booking
+      let receipt = null;
+      try {
+        receipt = JSON.parse(localStorage.getItem("cs_last_payment_receipt") || "null");
+      } catch (e) {}
+
+      const lastBooking = TraderApp.getLastBooking();
       const root = document.getElementById("success-root");
-      if (!b) {
-        root.innerHTML = '<div class="empty-state"><p>No recent payment found.</p><a class="btn btn-primary mt-4" href="dashboard.html">Dashboard</a></div>';
+
+      if (!receipt && !lastBooking) {
+        root.innerHTML = '<div class="empty-state"><p>No recent payment record found.</p><a class="btn btn-primary mt-4" href="dashboard.html">Go to Dashboard</a></div>';
       } else {
+        const b = lastBooking || {};
+        const bId = receipt?.bookingId || b.id || "BK-CONFIRMED";
+        const providerName = receipt?.provider || b.providerName || "Transport Partner";
+        const cargoName = receipt?.cargo || b.cargoName || "Cargo";
+        const route = receipt?.route || b.route || ["Origin", "Destination"];
+        const cbm = receipt?.cbm !== undefined ? receipt.cbm : (b.cbm || 2.4);
+        const weight = receipt?.weight !== undefined ? receipt.weight : (b.weight || 350);
+        const totalAmount = receipt?.totalAmount || b.total || 2880;
+        const amountPaid = receipt?.amountPaid || b.amountPaid || Math.round(totalAmount * 0.5);
+        const remainingAmount = receipt?.remainingAmount !== undefined ? receipt.remainingAmount : (totalAmount - amountPaid);
+        const status = receipt?.paymentStatus || b.paymentStatus || "Advance Paid";
+        const txnId = receipt?.transactionId || b.txnId || "TXN" + Date.now().toString().slice(-8);
+        const receiptNo = receipt?.receiptNumber || ("RCPT-" + Date.now().toString().slice(-6));
+        const paymentDate = receipt?.paymentDate ? new Date(receipt.paymentDate).toLocaleString("en-IN") : new Date().toLocaleString("en-IN");
+
+        const isFullyPaid = status === "Fully Paid" || remainingAmount === 0;
+
         root.innerHTML = `
           <div style="width:72px;height:72px;border-radius:50%;background:var(--cs-success-bg);color:var(--cs-success);display:grid;place-items:center;margin:0 auto 20px;font-size:2rem;font-weight:700">✓</div>
-          <h1 class="page-title" style="text-align:center">Payment successful!</h1>
-          <p class="page-sub" style="text-align:center">Your shared cargo space is reserved. Provider has been notified.</p>
-          <div class="notice notice-success" style="text-align:left;margin-bottom:20px">
-            <div class="font-bold mb-2">${b.id}</div>
-            <div class="text-sm">${b.providerName} · ${b.cargoName}</div>
-            <div class="text-sm mt-1">${CS.formatRoute(b.route)}</div>
-            <div class="flex-between mt-3">
-              <span>${b.cbm} CBM · ${b.weight} KG</span>
-              <strong>${CS.formatINR(b.total)}</strong>
+          <h1 class="page-title" style="text-align:center">${isFullyPaid ? "Payment Completed!" : "Advance Payment Successful!"}</h1>
+          <p class="page-sub" style="text-align:center">
+            ${isFullyPaid ? "All payments have been settled. Shipment is fully paid." : "Your 50% advance has been processed via Razorpay Test Mode. Capacity is confirmed!"}
+          </p>
+
+          <div class="notice notice-success" style="text-align:left;margin-bottom:24px">
+            <div class="flex-between mb-2">
+              <div>
+                <strong class="text-navy" style="font-size:1.15rem">${bId}</strong>
+                <div class="text-xs text-muted">Receipt No: ${receiptNo}</div>
+              </div>
+              <div>${CS.statusBadge(status)}</div>
             </div>
-            <div class="text-xs mt-2">Txn ${b.txnId} · ${b.paymentMethod}</div>
+
+            <div class="text-sm font-semibold text-slate-700 mt-2">${providerName} · ${cargoName}</div>
+            <div class="route-line text-sm mt-1 mb-3">${CS.formatRoute(route)}</div>
+
+            <div class="grid-2 gap-2 text-xs bg-white/70 p-3 rounded-lg border border-emerald-200 mb-3">
+              <div><span class="text-muted">Space:</span> <strong>${cbm} CBM</strong></div>
+              <div><span class="text-muted">Weight:</span> <strong>${weight} KG</strong></div>
+              <div><span class="text-muted">Payment Date:</span> <strong>${paymentDate}</strong></div>
+              <div><span class="text-muted">Gateway:</span> <strong>Razorpay (Test Mode)</strong></div>
+            </div>
+
+            <div class="space-y-1 text-sm pt-2 border-t border-emerald-200">
+              <div class="flex-between"><span class="text-muted">Total Booking Amount:</span><strong>${CS.formatINR(totalAmount)}</strong></div>
+              <div class="flex-between"><span class="text-emerald-700 font-semibold">Amount Paid:</span><strong class="text-emerald-700">${CS.formatINR(amountPaid)}</strong></div>
+              <div class="flex-between"><span class="text-amber-800 font-semibold">Remaining Due Upon Delivery:</span><strong class="text-amber-800">${CS.formatINR(remainingAmount)}</strong></div>
+            </div>
+
+            <div class="text-xs text-muted mt-3 pt-2 border-t border-emerald-200 flex-between">
+              <span>Txn: <code style="font-family:monospace">${txnId}</code></span>
+              <span class="badge badge-info" style="font-size:0.7rem">Razorpay Test</span>
+            </div>
           </div>
-          <div class="flex gap-2" style="justify-content:center;flex-wrap:wrap">
-            <a class="btn btn-primary" href="booking-details.html?id=${encodeURIComponent(b.id)}">View Booking</a>
-            <a class="btn btn-secondary" href="dashboard.html">Dashboard</a>
+
+          <div class="flex gap-3" style="justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-primary" id="btn-download-receipt">
+              📄 Download Receipt
+            </button>
+            <a class="btn btn-outline" href="booking-details.html?id=${encodeURIComponent(bId)}">
+              View Booking Details
+            </a>
+            <a class="btn btn-secondary" href="dashboard.html">
+              Dashboard
+            </a>
           </div>`;
+
+        // Attach Receipt Download
+        const receiptData = {
+          bookingId: bId,
+          trader: session.businessName || session.name,
+          provider: providerName,
+          route: route,
+          cargo: cargoName,
+          cbm: cbm,
+          weight: weight,
+          totalAmount: totalAmount,
+          amountPaid: amountPaid,
+          remainingAmount: remainingAmount,
+          paymentStatus: status,
+          paymentDate: paymentDate,
+          paymentMethod: "Razorpay (Test Mode)",
+          transactionId: txnId,
+          receiptNumber: receiptNo,
+        };
+
+        document.getElementById("btn-download-receipt")?.addEventListener("click", () => {
+          CS.downloadReceipt(receiptData);
+          CS.toast("Receipt downloaded successfully!", "success");
+        });
       }
     }
   </script>

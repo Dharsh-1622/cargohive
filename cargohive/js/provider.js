@@ -12,6 +12,18 @@
         CS.toast("Invalid credentials. Try provider@gvtransport.com / provider123", "error");
         return false;
       }
+      if (user.status === "Pending") {
+        CS.toast("Account pending approval. Please wait for Admin verification before logging in.", "warning");
+        return false;
+      }
+      if (user.status === "Rejected") {
+        CS.toast("Registration rejected: " + (user.rejectReason || "Verification failed"), "error");
+        return false;
+      }
+      if (user.status === "Suspended") {
+        CS.toast("This provider account is currently suspended by Admin.", "error");
+        return false;
+      }
       CS.setSession({
         role: "provider",
         id: user.id,
