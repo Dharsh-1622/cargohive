@@ -173,8 +173,54 @@
               <!-- Real-time Status Banner -->
               <div id="status-banner" style="margin-top:14px;padding:12px 14px;border-radius:8px;font-size:0.875rem;font-weight:600"></div>
 
+              <!-- Estimated Fare & Payment Breakdown -->
+              <div id="payment-estimate-box" style="margin-top:14px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:14px;font-size:0.875rem">
+                <div style="font-weight:700;color:#0b1f3a;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+                  <span>Fare &amp; Payment Breakdown</span>
+                  <span style="font-size:0.75rem;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:999px;font-weight:600">50/50 Split Payment</span>
+                </div>
+                <div class="flex-between" style="display:flex;justify-content:space-between;margin-bottom:4px;color:#475569">
+                  <span>Base Freight (<span id="disp-calc-rate">₹1,200</span>/CBM):</span>
+                  <strong id="disp-base-freight">₹2,304</strong>
+                </div>
+                <div class="flex-between" style="display:flex;justify-content:space-between;margin-bottom:4px;color:#475569">
+                  <span>Platform Fee (10%):</span>
+                  <strong id="disp-platform-fee">₹230</strong>
+                </div>
+                <div class="flex-between" style="display:flex;justify-content:space-between;padding-top:6px;border-top:1px dashed #cbd5e1;margin-top:6px;font-weight:700;color:#0f172a">
+                  <span>Total Booking Fare:</span>
+                  <span id="disp-total-fare" style="font-size:1.05rem;color:#1d4ed8">₹2,534</span>
+                </div>
+                
+                <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:10px;margin-top:10px">
+                  <div class="flex-between" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+                    <span style="font-weight:700;color:#1e40af;display:flex;align-items:center;gap:4px">
+                      <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                      1. Pay Now (50% Advance):
+                    </span>
+                    <strong id="disp-advance-due" style="color:#1e40af;font-size:1.05rem">₹1,267</strong>
+                  </div>
+                  <div style="font-size:0.75rem;color:#2563eb;margin-bottom:8px">Pay online via Razorpay to confirm vehicle reservation.</div>
+                  <div class="flex-between" style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;border-top:1px dashed #bfdbfe">
+                    <span style="font-size:0.8rem;color:#64748b">2. Remaining (50% on Delivery):</span>
+                    <strong id="disp-remaining-due" style="color:#64748b;font-size:0.85rem">₹1,267</strong>
+                  </div>
+                </div>
+
+                <div style="margin-top:10px;font-size:0.75rem;color:#64748b;display:flex;align-items:center;gap:6px">
+                  <span>💳</span>
+                  <span><strong>Payment Methods:</strong> Razorpay UPI (GPay, PhonePe, Paytm), Cards, Net Banking</span>
+                </div>
+              </div>
+
               <!-- Continue Button -->
-              <button type="button" id="continue-btn" class="btn btn-primary btn-block btn-lg mt-4" style="width:100%;margin-top:16px">Continue</button>
+              <button type="button" id="continue-btn" class="btn btn-primary btn-block btn-lg mt-4" style="width:100%;margin-top:14px;background:#1d4ed8;padding:12px 16px;font-weight:700;font-size:1rem;display:flex;align-items:center;justify-content:center;gap:8px">
+                <span id="continue-btn-text">Proceed to Payment (Pay 50% Advance: ₹1,267)</span>
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </button>
+              <div style="text-align:center;margin-top:8px">
+                <a href="#" id="preview-booking-link" class="text-xs text-blue-700 hover:underline">Review full booking summary first →</a>
+              </div>
             </div>
           </div>
         </div>
@@ -371,6 +417,29 @@
       sumRemWeightEl.textContent = remWeight.toFixed(2) + " KG";
       sumRemWeightEl.style.color = remWeight < 0 ? "#dc2626" : "#059669";
 
+      // Live Fare & 50/50 Split Calculation
+      const pricePerCbm = Number(currentVehicle.pricePerCBM || currentVehicle.pricePerCbm || 1200);
+      const baseFreight = Math.round(totalCBM * pricePerCbm);
+      const platformFee = Math.round(baseFreight * 0.1);
+      const totalFare = baseFreight + platformFee;
+      const advanceDue = Math.round(totalFare * 0.5);
+      const remainingDue = totalFare - advanceDue;
+
+      const dispRate = document.getElementById("disp-calc-rate");
+      if (dispRate) dispRate.textContent = "₹" + pricePerCbm.toLocaleString("en-IN");
+      const dispBase = document.getElementById("disp-base-freight");
+      if (dispBase) dispBase.textContent = "₹" + baseFreight.toLocaleString("en-IN");
+      const dispFee = document.getElementById("disp-platform-fee");
+      if (dispFee) dispFee.textContent = "₹" + platformFee.toLocaleString("en-IN");
+      const dispTotal = document.getElementById("disp-total-fare");
+      if (dispTotal) dispTotal.textContent = "₹" + totalFare.toLocaleString("en-IN");
+      const dispAdv = document.getElementById("disp-advance-due");
+      if (dispAdv) dispAdv.textContent = "₹" + advanceDue.toLocaleString("en-IN");
+      const dispRem = document.getElementById("disp-remaining-due");
+      if (dispRem) dispRem.textContent = "₹" + remainingDue.toLocaleString("en-IN");
+
+      const continueBtnText = document.getElementById("continue-btn-text");
+
       const banner = document.getElementById("status-banner");
 
       // Check field validity first (Requirement 7)
@@ -380,6 +449,7 @@
         banner.style.color = "#b45309";
         banner.style.border = "1px solid #fde68a";
         banner.textContent = "Please enter positive dimensions, quantity, and weight.";
+        if (continueBtnText) continueBtnText.textContent = "Enter Dimensions & Quantity to Proceed";
         return false;
       }
 
@@ -394,24 +464,28 @@
         banner.style.color = "#991b1b";
         banner.style.border = "1px solid #fecaca";
         banner.textContent = "Required cargo space exceeds available CBM. Required cargo weight exceeds available vehicle capacity.";
+        if (continueBtnText) continueBtnText.textContent = "Capacity Exceeded — Adjust Dimensions";
         return false;
       } else if (cbmExceeded) {
         banner.style.backgroundColor = "#fef2f2";
         banner.style.color = "#991b1b";
         banner.style.border = "1px solid #fecaca";
         banner.textContent = "Required cargo space exceeds available CBM.";
+        if (continueBtnText) continueBtnText.textContent = "Space Exceeded — Reduce Dimensions";
         return false;
       } else if (weightExceeded) {
         banner.style.backgroundColor = "#fef2f2";
         banner.style.color = "#991b1b";
         banner.style.border = "1px solid #fecaca";
         banner.textContent = "Required cargo weight exceeds available vehicle capacity.";
+        if (continueBtnText) continueBtnText.textContent = "Weight Exceeded — Reduce Package Weight";
         return false;
       } else {
         banner.style.backgroundColor = "#ecfdf5";
         banner.style.color = "#065f46";
         banner.style.border = "1px solid #a7f3d0";
         banner.textContent = "Cargo space and weight are available.";
+        if (continueBtnText) continueBtnText.textContent = "Proceed to Payment (Pay 50% Advance: ₹" + advanceDue.toLocaleString("en-IN") + ")";
         return true;
       }
     }
@@ -425,13 +499,79 @@
       }
     });
 
-    // Continue button handler (Requirement 15: validates and shows success, does NOT create booking)
+    function preparePendingBooking() {
+      const qty = parseFloat(document.getElementById("quantity").value) || 1;
+      const cargoType = document.getElementById("cargoType").value || "General Cargo";
+      const fragile = document.getElementById("fragile") ? document.getElementById("fragile").checked : false;
+      const specialNotes = document.getElementById("specialNotes") ? document.getElementById("specialNotes").value : "";
+      const totalCBM = parseFloat(document.getElementById("disp-total-cbm").textContent) || 1.92;
+      const totalWeight = parseFloat(document.getElementById("disp-total-weight").textContent) || 100;
+      const pricePerCbm = Number(currentVehicle.pricePerCBM || currentVehicle.pricePerCbm || 1200);
+      const amount = Math.round(totalCBM * pricePerCbm);
+      const fee = Math.round(amount * 0.1);
+      const total = amount + fee;
+      const advance = Math.round(total * 0.5);
+      const remaining = total - advance;
+
+      const pendingBooking = {
+        bookingPreviewId: window.CS && typeof CS.bookingId === "function" ? CS.bookingId() : ("BK-" + Date.now().toString().slice(-6)),
+        vehicleId: currentVehicle.vehicleId || currentVehicle.id || currentVehicle._id || "veh_001",
+        providerId: currentVehicle.providerId || "prov_gv",
+        providerName: currentVehicle.providerName || "Provider",
+        vehicleNumber: currentVehicle.vehicleNumber || "-",
+        route: currentVehicle.route || [currentVehicle.fromLocation, currentVehicle.toLocation],
+        cargoName: `${cargoType} (${qty} pkgs)`,
+        cargoCategory: cargoType,
+        quantity: qty,
+        cbm: totalCBM,
+        weight: totalWeight,
+        fragile: fragile,
+        specialNotes: specialNotes,
+        pricePerCbm: pricePerCbm,
+        amount: amount,
+        serviceFee: fee,
+        total: total,
+        advanceAmount: advance,
+        remainingAmount: remaining,
+        pickup: currentVehicle.fromLocation || (currentVehicle.route ? currentVehicle.route[0] : "Origin"),
+        delivery: currentVehicle.toLocation || (currentVehicle.route ? currentVehicle.route[currentVehicle.route.length - 1] : "Destination"),
+        pickupDate: currentVehicle.departureDate || currentVehicle.pickupDate || new Date().toISOString().split("T")[0],
+        deliveryDate: currentVehicle.etaDate || currentVehicle.deliveryDate || "",
+      };
+
+      if (window.TraderApp && typeof TraderApp.savePendingBooking === "function") {
+        TraderApp.savePendingBooking(pendingBooking);
+      }
+      localStorage.setItem("cs_trader_draft_pending", JSON.stringify(pendingBooking));
+      sessionStorage.setItem("cs_trader_draft_pending", JSON.stringify(pendingBooking));
+      return pendingBooking;
+    }
+
+    // Continue / Proceed to Payment button handler
     document.getElementById("continue-btn").addEventListener("click", () => {
       const isValid = recalculateAndValidate();
       if (isValid) {
+        preparePendingBooking();
         if (window.CS && typeof CS.toast === "function") {
-          CS.toast("Cargo space and weight are available. Details verified successfully!", "success");
+          CS.toast("Cargo space verified! Proceeding to Payment...", "success");
         }
+        setTimeout(() => {
+          location.href = "payment.html";
+        }, 300);
+      } else {
+        const bannerText = document.getElementById("status-banner").textContent;
+        if (window.CS && typeof CS.toast === "function") {
+          CS.toast(bannerText, "error");
+        }
+      }
+    });
+
+    document.getElementById("preview-booking-link")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      const isValid = recalculateAndValidate();
+      if (isValid) {
+        preparePendingBooking();
+        location.href = "booking-confirmation.html";
       } else {
         const bannerText = document.getElementById("status-banner").textContent;
         if (window.CS && typeof CS.toast === "function") {

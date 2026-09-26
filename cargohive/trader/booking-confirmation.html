@@ -119,9 +119,22 @@
               <span class="font-bold text-navy">Total</span>
               <span class="price-tag">${CS.formatINR(pending.total)}</span>
             </div>
-            <div class="notice notice-info mt-4">Demo checkout — no real money is charged. GST invoice will be available after payment in a full build.</div>
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-top:14px">
+              <div class="flex-between mb-2">
+                <span class="font-bold text-navy" style="display:flex;align-items:center;gap:4px">
+                  <svg width="16" height="16" fill="#1d4ed8" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                  Advance (50% Due Now):
+                </span>
+                <strong class="text-blue-700" style="font-size:1.1rem">${CS.formatINR(pending.advanceAmount || Math.round(pending.total * 0.5))}</strong>
+              </div>
+              <div class="flex-between text-xs text-muted">
+                <span>Remaining (50% on Delivery):</span>
+                <strong>${CS.formatINR(pending.remainingAmount || (pending.total - Math.round(pending.total * 0.5)))}</strong>
+              </div>
+            </div>
+            <div class="notice notice-info mt-4">Razorpay Test Mode — UPI (GPay, PhonePe, Paytm), Cards & Net Banking accepted.</div>
             <div class="flex gap-2 mt-6" style="flex-wrap:wrap">
-              <a class="btn btn-primary btn-lg" href="payment.html">Proceed to Payment</a>
+              <a class="btn btn-primary btn-lg" href="payment.html">Proceed to Payment (50% Advance) →</a>
               <a class="btn btn-secondary" href="cargo-details.html?vehicle=${pending.vehicleId}">Go Back</a>
             </div>
           </div>`;

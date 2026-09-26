@@ -931,7 +931,7 @@
   }
 
   function getVehicle(id) {
-    return getVehicles().find((v) => v.id === id) || SEED_VEHICLES.find((v) => v.id === id);
+    return getVehicles().find((v) => (v.id === id || v._id === id || v.vehicleId === id)) || SEED_VEHICLES.find((v) => (v.id === id || v._id === id || v.vehicleId === id));
   }
 
   function getBooking(id) {
