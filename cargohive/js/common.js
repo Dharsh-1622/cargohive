@@ -1142,118 +1142,240 @@
   }
 
   /* ---------- Receipt Generator & Downloader ---------- */
+  /* ---------- Receipt Generator & Downloader (PDF Format) ---------- */
+  function escapePdfText(text) {
+    if (text === null || text === undefined) return "";
+    return String(text)
+      .replace(/\\/g, "\\\\")
+      .replace(/\(/g, "\\(")
+      .replace(/\)/g, "\\)")
+      .replace(/[\r\n]/g, " ")
+      .replace(/[^\x20-\x7E]/g, " ");
+  }
+
   function downloadReceipt(data) {
     if (!data) return;
-    const bId = data.bookingId || data.id || "BK-UNKNOWN";
-    const trader = data.trader || data.traderName || "Trader";
-    const provider = data.provider || data.providerName || "Provider";
-    const route = Array.isArray(data.route) ? data.route.join(" → ") : (data.route || "—");
-    const cargo = data.cargo || data.cargoName || "General Goods";
-    const cbm = data.cbm !== undefined ? data.cbm : "—";
-    const weight = data.weight !== undefined ? data.weight : "—";
-    const totalAmount = data.totalAmount !== undefined ? data.totalAmount : (data.total || 0);
-    const amountPaid = data.amountPaid !== undefined ? data.amountPaid : (data.advanceAmount || Math.round(totalAmount * 0.5));
-    const remainingAmount = data.remainingAmount !== undefined ? data.remainingAmount : (totalAmount - amountPaid);
-    const paymentStatus = data.paymentStatus || data.status || "Advance Paid";
-    const paymentDate = data.paymentDate ? new Date(data.paymentDate).toLocaleString("en-IN") : new Date().toLocaleString("en-IN");
-    const txnId = data.transactionId || data.txnId || data.razorpayPaymentId || "—";
-    const receiptNo = data.receiptNumber || ("RCPT-" + Date.now().toString().slice(-6));
+    const bId = escapePdfText(data.bookingId || data.id || "BK-UNKNOWN");
+    const trader = escapePdfText(data.trader || data.traderName || "Trader");
+    const provider = escapePdfText(data.provider || data.providerName || "Provider");
+    const vehicleNo = escapePdfText(data.vehicleNumber || "TN-33-AB-1234");
+    const route = escapePdfText(Array.isArray(data.route) ? data.route.join(" -> ") : (data.route || "-"));
+    const cargo = escapePdfText(data.cargo || data.cargoName || "General Goods");
+    const cbm = escapePdfText(String(data.cbm !== undefined ? data.cbm : "1.92"));
+    const weight = escapePdfText(String(data.weight !== undefined ? data.weight : "100"));
+    const totalAmount = "Rs. " + Number(data.totalAmount !== undefined ? data.totalAmount : (data.total || 0)).toLocaleString("en-IN");
+    const amountPaid = "Rs. " + Number(data.amountPaid !== undefined ? data.amountPaid : (data.advanceAmount || Math.round(data.totalAmount * 0.5 || 0))).toLocaleString("en-IN");
+    const remainingAmount = "Rs. " + Number(data.remainingAmount !== undefined ? data.remainingAmount : 0).toLocaleString("en-IN");
+    const paymentStatus = escapePdfText(data.paymentStatus || data.status || "Advance Paid (50%)");
+    const paymentDate = escapePdfText(data.paymentDate ? new Date(data.paymentDate).toLocaleString("en-IN") : new Date().toLocaleString("en-IN"));
+    const txnId = escapePdfText(data.transactionId || data.txnId || data.razorpayPaymentId || "pay_test_ref");
+    const receiptNo = escapePdfText(data.receiptNumber || ("RCPT-" + Date.now().toString().slice(-6)));
 
-    const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Payment Receipt — ${bId} — CargoHive</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 30px; color: #0b1f3a; background: #f8fafc; }
-    .receipt-container { max-width: 680px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 36px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0b1f3a; padding-bottom: 20px; margin-bottom: 24px; }
-    .brand { font-size: 26px; font-weight: 800; color: #0b1f3a; display: flex; align-items: center; gap: 8px; }
-    .brand span { color: #1d4ed8; }
-    .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; background: #ecfdf5; color: #065f46; text-transform: uppercase; }
-    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; font-size: 14px; }
-    .meta-box { background: #f1f5f9; padding: 12px 16px; border-radius: 8px; }
-    .meta-label { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; margin-bottom: 4px; }
-    .meta-val { font-size: 15px; font-weight: 700; color: #0f172a; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px; }
-    th { text-align: left; background: #0b1f3a; color: #ffffff; padding: 10px 14px; font-weight: 600; }
-    td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; }
-    .total-section { margin-top: 10px; border-top: 2px solid #e2e8f0; padding-top: 14px; }
-    .total-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
-    .total-row.highlight { font-size: 18px; font-weight: 800; color: #1d4ed8; border-top: 1px solid #e2e8f0; padding-top: 10px; }
-    .footer { margin-top: 32px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px dashed #cbd5e1; padding-top: 16px; }
-    .btn-print { display: inline-block; margin-top: 16px; background: #1d4ed8; color: white; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; cursor: pointer; border: none; }
-    @media print { .no-print { display: none; } body { background: #fff; padding: 0; } .receipt-container { box-shadow: none; border: none; } }
-  </style>
-</head>
-<body>
-  <div class="receipt-container">
-    <div class="header">
-      <div>
-        <div class="brand">Cargo<span>Hive</span></div>
-        <div style="font-size:13px;color:#64748b;margin-top:4px">Official Payment Receipt & Bill of Lading</div>
-      </div>
-      <div style="text-align:right">
-        <span class="badge">${paymentStatus}</span>
-        <div style="font-size:12px;color:#64748b;margin-top:6px">Receipt No: <strong>${receiptNo}</strong></div>
-      </div>
-    </div>
+    const cmds = [];
+    function c(s) { cmds.push(s); }
 
-    <div class="meta-grid">
-      <div class="meta-box"><div class="meta-label">Booking ID</div><div class="meta-val">${bId}</div></div>
-      <div class="meta-box"><div class="meta-label">Payment Date</div><div class="meta-val">${paymentDate}</div></div>
-      <div class="meta-box"><div class="meta-label">Trader (Shipper)</div><div class="meta-val">${trader}</div></div>
-      <div class="meta-box"><div class="meta-label">Provider (Transporter)</div><div class="meta-val">${provider}</div></div>
-    </div>
+    // Canvas Background
+    c("0.98 0.98 0.99 rg");
+    c("0 0 595 842 re f");
 
-    <table>
-      <thead>
-        <tr>
-          <th>Cargo Details</th>
-          <th>Route Corridor</th>
-          <th>Space (CBM)</th>
-          <th>Weight (KG)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>${cargo}</strong><br/><span style="font-size:12px;color:#64748b">Txn ID: ${txnId}</span></td>
-          <td>${route}</td>
-          <td><strong>${cbm} CBM</strong></td>
-          <td>${weight} KG</td>
-        </tr>
-      </tbody>
-    </table>
+    // Top Navy Header Banner
+    c("0.043 0.121 0.227 rg");
+    c("0 745 595 97 re f");
 
-    <div class="total-section">
-      <div class="total-row"><span style="color:#64748b">Total Booking Amount:</span><strong>₹${Number(totalAmount).toLocaleString("en-IN")}</strong></div>
-      <div class="total-row"><span style="color:#059669;font-weight:600">Amount Paid (Processed):</span><strong style="color:#059669">₹${Number(amountPaid).toLocaleString("en-IN")}</strong></div>
-      <div class="total-row"><span style="color:#d97706;font-weight:600">Remaining Amount Due:</span><strong style="color:#d97706">₹${Number(remainingAmount).toLocaleString("en-IN")}</strong></div>
-      <div class="total-row highlight"><span>Current Payment Status:</span><span>${paymentStatus}</span></div>
-    </div>
+    // Accent Stripe
+    c("0.114 0.306 0.847 rg");
+    c("0 739 595 6 re f");
 
-    <div class="footer">
-      <p>Thank you for partnering with <strong>CargoHive</strong> — Shared Cargo & Smart Freight Network.</p>
-      <p>Razorpay Test Mode Verified Receipt.</p>
-      <div class="no-print">
-        <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
-      </div>
-    </div>
-  </div>
-</body>
-</html>`;
+    // Brand Title
+    c("BT");
+    c("/F2 26 Tf");
+    c("1 1 1 rg");
+    c("45 798 Td");
+    c("(CargoHive) Tj");
+    c("ET");
 
-    const blob = new Blob([html], { type: "text/html" });
+    c("BT");
+    c("/F1 10 Tf");
+    c("0.7 0.82 0.95 rg");
+    c("45 776 Td");
+    c("(OFFICIAL PAYMENT RECEIPT & BILL OF LADING) Tj");
+    c("ET");
+
+    // Status Badge
+    c("0.02 0.45 0.32 rg");
+    c("410 780 145 28 re f");
+    c("BT");
+    c("/F2 11 Tf");
+    c("1 1 1 rg");
+    c("420 790 Td");
+    c("(" + paymentStatus + ") Tj");
+    c("ET");
+
+    // Metadata Card
+    c("1 1 1 rg");
+    c("40 590 515 130 re f");
+    c("0.85 0.88 0.92 RG");
+    c("1 w");
+    c("40 590 515 130 re S");
+
+    function drawMeta(x, y, label, val) {
+      c("BT");
+      c("/F1 8 Tf");
+      c("0.45 0.5 0.58 rg");
+      c(x + " " + (y + 16) + " Td");
+      c("(" + label + ") Tj");
+      c("ET");
+
+      c("BT");
+      c("/F2 11 Tf");
+      c("0.06 0.12 0.23 rg");
+      c(x + " " + y + " Td");
+      c("(" + val + ") Tj");
+      c("ET");
+    }
+
+    drawMeta(55, 680, "BOOKING ID", bId);
+    drawMeta(215, 680, "RECEIPT NUMBER", receiptNo);
+    drawMeta(375, 680, "PAYMENT DATE", paymentDate);
+
+    drawMeta(55, 615, "SHIPPER (TRADER)", trader);
+    drawMeta(215, 615, "TRANSPORTER (PROVIDER)", provider);
+    drawMeta(375, 615, "CARRIER VEHICLE", vehicleNo);
+
+    // Shipment & Cargo Details Card
+    c("1 1 1 rg");
+    c("40 430 515 140 re f");
+    c("0.85 0.88 0.92 RG");
+    c("40 430 515 140 re S");
+
+    c("0.94 0.96 0.98 rg");
+    c("40 535 515 35 re f");
+    c("BT");
+    c("/F2 11 Tf");
+    c("0.06 0.12 0.23 rg");
+    c("55 548 Td");
+    c("(SHIPMENT SPECIFICATIONS & ROUTE) Tj");
+    c("ET");
+
+    drawMeta(55, 495, "ROUTE CORRIDOR", route);
+    drawMeta(310, 495, "CARGO DESCRIPTION", cargo);
+    drawMeta(55, 445, "RESERVED VOLUME", cbm + " CBM");
+    drawMeta(205, 445, "WEIGHT ALLOCATION", weight + " KG");
+    drawMeta(355, 445, "TRANSACTION REFERENCE", txnId);
+
+    // Financial Breakdown Card (Table Style)
+    c("1 1 1 rg");
+    c("40 230 515 180 re f");
+    c("0.85 0.88 0.92 RG");
+    c("40 230 515 180 re S");
+
+    c("0.043 0.121 0.227 rg");
+    c("40 375 515 35 re f");
+    c("BT");
+    c("/F2 11 Tf");
+    c("1 1 1 rg");
+    c("55 388 Td");
+    c("(PAYMENT BREAKDOWN (50/50 SPLIT STRUCTURE)) Tj");
+    c("ET");
+
+    function drawRow(y, label, val, isBold, color) {
+      c("0.92 0.94 0.96 RG");
+      c("55 " + (y - 8) + " m 540 " + (y - 8) + " l S");
+      c("BT");
+      c(isBold ? "/F2 11 Tf" : "/F1 11 Tf");
+      c("0.2 0.25 0.3 rg");
+      c("55 " + y + " Td");
+      c("(" + label + ") Tj");
+      c("ET");
+
+      c("BT");
+      c(isBold ? "/F2 12 Tf" : "/F1 11 Tf");
+      if (color === "green") c("0.02 0.5 0.3 rg");
+      else if (color === "amber") c("0.8 0.45 0.05 rg");
+      else if (color === "blue") c("0.1 0.3 0.8 rg");
+      else c("0.06 0.12 0.23 rg");
+      c("410 " + y + " Td");
+      c("(" + val + ") Tj");
+      c("ET");
+    }
+
+    drawRow(345, "Total Booking Amount (Freight + Service Fee):", totalAmount, false);
+    drawRow(310, "1. Advance Paid (50% Processed Now):", amountPaid, true, "green");
+    drawRow(275, "2. Remaining Balance (50% Due upon Delivery):", remainingAmount, true, "amber");
+    drawRow(240, "Current Booking & Settlement Status:", paymentStatus, true, "blue");
+
+    // Digital Verification & Seal
+    c("0.96 0.97 0.98 rg");
+    c("40 115 515 95 re f");
+    c("0.88 0.9 0.94 RG");
+    c("40 115 515 95 re S");
+
+    c("BT");
+    c("/F2 10 Tf");
+    c("0.1 0.35 0.7 rg");
+    c("55 185 Td");
+    c("(CARGOHIVE DIGITAL VERIFICATION SEAL) Tj");
+    c("ET");
+
+    c("BT");
+    c("/F1 9 Tf");
+    c("0.35 0.4 0.45 rg");
+    c("55 168 Td");
+    c("(This document is an electronically generated receipt issued by CargoHive Logistics Network.) Tj");
+    c("55 153 Td");
+    c("(Razorpay Test Mode Verified - Transaction Reference: " + txnId + ") Tj");
+    c("55 138 Td");
+    c("(No physical signature is required under the Information Technology Act. Valid for freight transit.) Tj");
+    c("ET");
+
+    // Footer text
+    c("BT");
+    c("/F1 8 Tf");
+    c("0.5 0.55 0.6 rg");
+    c("140 70 Td");
+    c("(CargoHive Logistics Platform | cargohive.vercel.app | Support: help@cargohive.example) Tj");
+    c("ET");
+
+    const streamContent = cmds.join("\n");
+    const streamLength = new TextEncoder().encode(streamContent).length;
+
+    const objects = [];
+    objects.push("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj");
+    objects.push("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj");
+    objects.push("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>\nendobj");
+    objects.push("4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj");
+    objects.push("5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj");
+    objects.push("6 0 obj\n<< /Length " + streamLength + " >>\nstream\n" + streamContent + "\nendstream\nendobj");
+
+    let pos = 0;
+    const header = "%PDF-1.4\n";
+    pos += new TextEncoder().encode(header).length;
+
+    const xref = ["xref", "0 " + (objects.length + 1), "0000000000 65535 f "];
+    let body = "";
+    for (let i = 0; i < objects.length; i++) {
+      xref.push(String(pos).padStart(10, "0") + " 00000 n ");
+      body += objects[i] + "\n";
+      pos += new TextEncoder().encode(objects[i] + "\n").length;
+    }
+
+    const xrefStr = xref.join("\n") + "\n";
+    const trailer = "trailer\n<< /Size " + (objects.length + 1) + " /Root 1 0 R >>\nstartxref\n" + pos + "\n%%EOF\n";
+
+    const pdfString = header + body + xrefStr + trailer;
+    const blob = new Blob([pdfString], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `CargoHive_Receipt_${bId}.html`;
+    a.download = `CargoHive_Receipt_${bId}.pdf`;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    }, 200);
+    }, 300);
+
+    toast(`Downloaded PDF receipt: CargoHive_Receipt_${bId}.pdf`, "success");
   }
 
   /* ---------- Init ---------- */
